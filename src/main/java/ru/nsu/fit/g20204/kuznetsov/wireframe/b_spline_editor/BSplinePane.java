@@ -345,4 +345,8 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     @Override
     public void mouseExited(MouseEvent e) {}
+
+    public BSpline getSpline() {
+        return spline;
+    }
 }
