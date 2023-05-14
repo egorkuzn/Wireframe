@@ -68,7 +68,64 @@ public class BSplineParamPane extends JPanel {
     }
 
     private JPanel getKeyPointParametersPane() {
-        return null;
+        JPanel keyPointParametersPane = new JPanel();
+        keyPointParametersPane.setLayout(new BoxLayout(keyPointParametersPane, BoxLayout.PAGE_AXIS));
+
+        // Key point index
+        JPanel indexPane = new JPanel();
+        indexPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+        indexPane.add(new JLabel("Index: "));
+
+        JTextArea indexField = new JTextArea();
+        indexField.setEditable(false);
+        indexPane.add(indexField);
+
+        keyPointParametersPane.add(indexPane);
+
+        // X coordinate
+        SpinnerNumberModel xSpinnerModel = new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0);
+        JSpinner xSpinner = new JSpinner(xSpinnerModel);
+        keyPointParametersPane.add(getSpinnerPane("X", xSpinner));
+
+        // Y coordinate
+        SpinnerNumberModel ySpinnerModel = new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0);
+        JSpinner ySpinner = new JSpinner(ySpinnerModel);
+        keyPointParametersPane.add(getSpinnerPane("Y", ySpinner));
+
+        xSpinner.addChangeListener(c -> splinePane.setSelectedX((double)xSpinnerModel.getNumber()));
+        ySpinner.addChangeListener(c -> splinePane.setSelectedY((double)ySpinnerModel.getNumber()));
+
+        splinePane.addPointModifiedListener((i, p) -> {
+            if (i == -1) {
+                indexField.setText("None");
+                xSpinner.setEnabled(false);
+                ySpinner.setEnabled(false);
+                return null;
+            }
+            indexField.setText(String.valueOf(i));
+
+            xSpinner.setEnabled(true);
+            ySpinner.setEnabled(true);
+
+            xSpinnerModel.setValue(p.x);
+            ySpinnerModel.setValue(p.y);
+
+            return null;
+        });
+
+        return keyPointParametersPane;
+    }
+
+    private JPanel getIndex() {
+        var indexPane = new JPanel();
+        indexPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+        indexPane.add(new JLabel("Index: "));
+
+        var indexFiled = new JTextArea();
+        indexFiled.setEditable(false);
+        indexPane.add(indexFiled);
+
+        return indexPane;
     }
 
     private JPanel getSplineParameterPane() {
