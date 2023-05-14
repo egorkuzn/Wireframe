@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public class BSplinePane extends JPanel implements MouseWheelListener, MouseMotionAdapter, MouseAdapter {
+public class BSplinePane extends JPanel implements MouseWheelListener, MouseMotionListener, MouseListener {
     private static final int INDENT_STEP_ON_DEFAULT_ZOOM = 64;
 
     public BSplinePane() {
@@ -50,7 +50,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D)g;
+        Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -58,45 +58,45 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         paintAxes(g2d);
         paintSpline(g2d);
     }
-    
+
     private int verticalPosition;
     private int horizontalPosition;
-    
+
     private void paintAxes(Graphics2D g2d) {
         g2d.setStroke(new BasicStroke(axisSize));
 
         verticalPosition = this.getWidth() / 2 + verticalOffset;
         horizontalPosition = this.getWidth() / 2 + horizontalOffset;
-        
+
         paintXAxes(g2d);
         paintYAxes(g2d);
     }
-    
+
     private void paintXAxes(Graphics2D g2d) {
         g2d.setColor(xAxisColor);
         g2d.drawLine(0, verticalPosition, this.getWidth() - 1, verticalPosition);
-        
+
         for (int i = horizontalPosition + pixelsPerIndentStep; i <= this.getWidth(); i += pixelsPerIndentStep) {
-            g2d.drawLine(i, verticalPosition - axisSize * 2,i, verticalPosition + axisSize * 2);
+            g2d.drawLine(i, verticalPosition - axisSize * 2, i, verticalPosition + axisSize * 2);
         }
-        
+
         for (int i = horizontalPosition - pixelsPerIndentStep; i > 0; i -= pixelsPerIndentStep) {
-            g2d.drawLine(i, verticalPosition - axisSize * 2,i, verticalPosition + axisSize * 2);
+            g2d.drawLine(i, verticalPosition - axisSize * 2, i, verticalPosition + axisSize * 2);
         }
     }
-    
+
     private void paintYAxes(Graphics2D g2d) {
         g2d.setColor(yAxisColor);
         g2d.drawLine(horizontalPosition, 0, horizontalPosition, this.getHeight() - 1);
-        
+
         for (int i = verticalPosition + pixelsPerIndentStep; i <= this.getHeight(); i += pixelsPerIndentStep) {
-            g2d.drawLine(horizontalPosition + axisSize * 2, i,horizontalPosition - axisSize * 2, i);
+            g2d.drawLine(horizontalPosition + axisSize * 2, i, horizontalPosition - axisSize * 2, i);
         }
         for (int i = verticalPosition - pixelsPerIndentStep; i > 0; i -= pixelsPerIndentStep) {
-            g2d.drawLine(horizontalPosition + axisSize * 2, i,horizontalPosition - axisSize * 2, i);
+            g2d.drawLine(horizontalPosition + axisSize * 2, i, horizontalPosition - axisSize * 2, i);
         }
     }
-    
+
     private void paintSpline(Graphics2D g2d) {
         if (spline.getKeyPoints().isEmpty()) {
             return;
@@ -112,7 +112,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         g2d.setColor(brokenLineColor);
         Point previousScreenKeyPoint = getPointOnScreen(spline.getKeyPoints().get(0));
 
-        for (var point: spline.getKeyPoints()) {
+        for (var point : spline.getKeyPoints()) {
             Point screenPoint = getPointOnScreen(point);
 
             g2d.drawLine(previousScreenKeyPoint.x, previousScreenKeyPoint.y, screenPoint.x, screenPoint.y);
@@ -200,7 +200,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
             Rectangle2D newBounds = new Rectangle(
                     pointOnScreen,
-                    new Dimension(pointRadius * 2, pointRadius * 2 )
+                    new Dimension(pointRadius * 2, pointRadius * 2)
             );
 
             if (newBounds.contains(point)) {
@@ -227,6 +227,11 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         this.repaint();
     }
 
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
     private void paneDrag(MouseEvent e) {
         int deltaX = dragOrigin.x - e.getX();
         int deltaY = dragOrigin.y - e.getY();
@@ -246,8 +251,98 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
                 continuousPoint.y
         );
 
-        for (var l: pointModifiedListeners) {
+        for (var l : pointModifiedListeners) {
             l.apply(dragPointIndex, spline.getKeyPoints().get(dragPointIndex));
         }
     }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        int pointIndex = findSelectedKeyPoint(e.getPoint());
+
+        if (pointIndex != -1) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                dragPoint(pointIndex);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                removeSplinePoint(pointIndex);
+            }
+
+            return;
+        }
+
+        dragOrigin = new Point(e.getPoint());
+    }
+
+    private void dragPoint(int pointIndex) {
+        dragPointIndex = pointIndex;
+
+        for (var l : pointModifiedListeners) {
+            l.apply(dragPointIndex, spline.getKeyPoints().get(dragPointIndex));
+        }
+    }
+
+    private void removeSplinePoint(int pointIndex) {
+        spline.removeKeyPoint(pointIndex);
+        dragPointIndex = -1;
+
+        for (var l : pointModifiedListeners) {
+            l.apply(dragPointIndex, new Point2D.Double(0, 0));
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int pointIndex = findSelectedKeyPoint(e.getPoint());
+
+        if (pointIndex != -1) {
+            dragPointIndex = pointIndex;
+            return;
+        }
+
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            addKeyButton(e);
+        }
+
+        this.repaint();
+    }
+
+    private void addKeyButton(MouseEvent e) {
+        Point2D.Double point = this.getContinuousPoint(e.getX(), e.getY());
+
+        spline.addKeyPoint(point);
+
+        dragPointIndex = spline.getKeyPoints().size() - 1;
+
+        for (var l: pointModifiedListeners) {
+            l.apply(dragPointIndex, spline.getSplinePoints().get(dragPointIndex));
+        }
+    }
+
+    public void addPointModifiedListener(BiFunction<Integer, Point2D.Double, Void> listener) {
+        pointModifiedListeners.add(listener);
+    }
+
+    public void setSelectedX(double x) {
+        spline.setKeyPointX(dragPointIndex, x);
+        this.repaint();
+    }
+
+    public void setSelectedY(double y) {
+        spline.setKeyPointY(dragPointIndex, y);
+        this.repaint();
+    }
+
+    public void setSplinePointsPerSegment(int splinePointsPerSegment) {
+        spline.setSplinePointsPerSegment(splinePointsPerSegment);
+        this.repaint();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 }
