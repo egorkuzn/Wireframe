@@ -4,4 +4,8 @@ public class SceneNode extends Node {
     public SceneNode(Node parentNode) {
         super(parentNode);
     }
+
+    public CameraNode getCameraNode() {
+        return new CameraNode(this);
+    }
 }
