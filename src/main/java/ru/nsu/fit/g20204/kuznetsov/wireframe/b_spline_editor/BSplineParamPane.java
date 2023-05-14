@@ -7,32 +7,39 @@ public class BSplineParamPane extends JPanel {
     private final BSplinePane splinePane;
 
 
-    public BSplineParamPane(BSplinePane splinePane) {
+    public BSplineParamPane(BSplinePane splinePane, BSplineEditor splineEditor) {
         super();
         this.splinePane = splinePane;
-        addAll();
+        addAll(splineEditor);
     }
 
-    private void addAll() {
-        add(getSplineParametrPane());
-        add(getKeyPointParamentersPane());
+    private void addAll(BSplineEditor splineEditor) {
+        add(getSplineParameterPane());
+        add(getKeyPointParametersPane());
         add(getModelParametersPane());
-        add(getApplyButton());
+        add(getApplyButton(splineEditor));
     }
 
-    private Component getApplyButton() {
+    private JButton getApplyButton(BSplineEditor splineEditor) {
+        JButton applyButton = new JButton("Apply");
+        applyButton.addActionListener(e -> splineEditor.applySpline());
+        return applyButton;
+    }
+
+    private JPanel getModelParametersPane() {
+        JPanel splineParametersPane = new JPanel();
+        splineParametersPane.setLayout(new BoxLayout(splineParametersPane, BoxLayout.PAGE_AXIS));
+
+
+
+        return splineParametersPane;
+    }
+
+    private JPanel getKeyPointParametersPane() {
         return null;
     }
 
-    private Component getModelParametersPane() {
-        return null;
-    }
-
-    private Component getKeyPointParamentersPane() {
-        return null;
-    }
-
-    private Component getSplineParametrPane() {
+    private JPanel getSplineParameterPane() {
         return null;
     }
 }

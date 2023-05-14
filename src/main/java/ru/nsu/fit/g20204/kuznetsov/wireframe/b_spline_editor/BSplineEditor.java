@@ -8,4 +8,7 @@ public class BSplineEditor extends JPanel {
     public BSplineEditor() {
 
     }
+
+    public void applySpline() {
+    }
 }
