@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 public class BSplinePane extends JPanel implements MouseWheelListener, MouseMotionAdapter, MouseAdapter {
+    private static final int INDENT_STEP_ON_DEFAULT_ZOOM = 64;
+
     public BSplinePane() {
         super();
         this.addMouseListener(this);
@@ -31,6 +33,18 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
     private int brokenLineSize = 1;
     private int pointRadius = 10;
 
+    private int pixelsPerIndentStep = INDENT_STEP_ON_DEFAULT_ZOOM;
+    private double zoom = 100;
+    private int verticalOffset = 0;
+    private int horizontalOffset = 0;
+
+    private Point dragOrigin;
+    private int dragPointIndex;
+
+    List<BiFunction<Integer, Point2D.Double, Void>> pointModifiedListener = new ArrayList<>();
+
+    private final BSpline spline = new BSpline();
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -40,5 +54,49 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+        paintAxes(g2d);
+        paintSpline(g2d);
+    }
+    
+    private int verticalPosition;
+    private int horizontalPosition;
+    
+    private void paintAxes(Graphics2D g2d) {
+        g2d.setStroke(new BasicStroke(axisSize));
+
+        verticalPosition = this.getWidth() / 2 + verticalOffset;
+        horizontalPosition = this.getWidth() / 2 + horizontalOffset;
+        
+        paintXAxes(g2d);
+        paintYAxes(g2d);
+    }
+    
+    private void paintXAxes(Graphics2D g2d) {
+        g2d.setColor(xAxisColor);
+        g2d.drawLine(0, verticalPosition, this.getWidth() - 1, verticalPosition);
+        
+        for (int i = horizontalPosition + pixelsPerIndentStep; i <= this.getWidth(); i += pixelsPerIndentStep) {
+            g2d.drawLine(i, verticalPosition - axisSize * 2,i, verticalPosition + axisSize * 2);
+        }
+        
+        for (int i = horizontalPosition - pixelsPerIndentStep; i > 0; i -= pixelsPerIndentStep) {
+            g2d.drawLine(i, verticalPosition - axisSize * 2,i, verticalPosition + axisSize * 2);
+        }
+    }
+    
+    private void paintYAxes(Graphics2D g2d) {
+        g2d.setColor(yAxisColor);
+        g2d.drawLine(horizontalPosition, 0, horizontalPosition, this.getHeight() - 1);
+        
+        for (int i = verticalPosition + pixelsPerIndentStep; i <= this.getHeight(); i += pixelsPerIndentStep) {
+            g2d.drawLine(horizontalPosition + axisSize * 2, i,horizontalPosition - axisSize * 2, i);
+        }
+        for (int i = verticalPosition - pixelsPerIndentStep; i > 0; i -= pixelsPerIndentStep) {
+            g2d.drawLine(horizontalPosition + axisSize * 2, i,horizontalPosition - axisSize * 2, i);
+        }
+    }
+    
+    private void paintSpline(Graphics2D g2d) {
+        if (spline.getKeyPoints().isEmpty())
     }
 }
