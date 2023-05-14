@@ -4,10 +4,9 @@ import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -43,7 +42,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
     private Point dragOrigin;
     private int dragPointIndex;
 
-    List<BiFunction<Integer, Point2D.Double, Void>> pointModifiedListener = new ArrayList<>();
+    List<BiFunction<Integer, Point2D.Double, Void>> pointModifiedListeners = new ArrayList<>();
 
     private final BSpline spline = new BSpline();
 
@@ -158,6 +157,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
                 g2d.setColor(selectedKeyPointColor);
             else
                 g2d.setColor(keyPointColor);
+
             g2d.drawOval(screenPoint.x - pointRadius, screenPoint.y - pointRadius, pointRadius * 2, pointRadius * 2);
         }
     }
@@ -176,6 +176,78 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
                 previousScreenSplinePoint = screenPoint;
             }
+        }
+    }
+
+    public void setZoom(double zoom) {
+        if (zoom <= 0 || zoom > 800) {
+            return;
+        }
+
+        this.zoom = zoom;
+        pixelsPerIndentStep = (int) (INDENT_STEP_ON_DEFAULT_ZOOM / (zoom / 100));
+
+        this.repaint();
+    }
+
+    private int findSelectedKeyPoint(Point point) {
+        for (int pointIndex = 0; pointIndex < spline.getKeyPoints().size(); pointIndex++) {
+            Point2D.Double keyPoint = spline.getKeyPoints().get(pointIndex);
+
+            Point pointOnScreen = this.getPointOnScreen(keyPoint.x, keyPoint.y);
+            pointOnScreen.x -= pointRadius;
+            pointOnScreen.y -= pointRadius;
+
+            Rectangle2D newBounds = new Rectangle(
+                    pointOnScreen,
+                    new Dimension(pointRadius * 2, pointRadius * 2 )
+            );
+
+            if (newBounds.contains(point)) {
+                return pointIndex;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        this.setZoom(zoom + 10 * e.getPreciseWheelRotation());
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (dragOrigin != null) {
+            paneDrag(e);
+        } else if (dragPointIndex != -1) {
+            keyPointDrag(e);
+        }
+
+        this.repaint();
+    }
+
+    private void paneDrag(MouseEvent e) {
+        int deltaX = dragOrigin.x - e.getX();
+        int deltaY = dragOrigin.y - e.getY();
+
+        horizontalOffset -= deltaX;
+        verticalOffset -= deltaY;
+
+        dragOrigin = new Point(e.getPoint());
+    }
+
+    private void keyPointDrag(MouseEvent e) {
+        Point2D.Double continuousPoint = this.getContinuousPoint(e.getX(), e.getY());
+
+        spline.setKeyPoint(
+                dragPointIndex,
+                continuousPoint.x,
+                continuousPoint.y
+        );
+
+        for (var l: pointModifiedListeners) {
+            l.apply(dragPointIndex, spline.getKeyPoints().get(dragPointIndex));
         }
     }
 }
