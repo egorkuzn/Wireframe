@@ -151,7 +151,7 @@ public class BSplineParamPane extends JPanel {
 
         // Spline points per segment
         JSpinner splinePointsPerSegmentSpinner = new JSpinner(splinePointsPerSegmentSpinnerModel);
-        splineParametersPane.add(getSpinnerPane("Points per spline segment", splinePointsPerSegmentSpinner));
+        splineParametersPane.add(getSpinnerPane("<html>Points per<br/>spline segment</html>", splinePointsPerSegmentSpinner));
 
         splinePointsPerSegmentSpinner.addChangeListener(l -> {
             splinePane.setSplinePointsPerSegment((int) splinePointsPerSegmentSpinnerModel.getValue());
@@ -161,5 +161,8 @@ public class BSplineParamPane extends JPanel {
         });
 
         return splineParametersPane;
+    }
+
+    public Object getSplineModel() {
     }
 }
