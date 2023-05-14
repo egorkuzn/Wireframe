@@ -20,6 +20,20 @@ public class BSplineParamPane extends JPanel {
             1
     );
 
+    private final SpinnerNumberModel rotationSpinnerModel = new SpinnerNumberModel(
+            6,
+            1,
+            360,
+            1
+    );
+
+    private final SpinnerNumberModel alongLayersSpinnerModel = new SpinnerNumberModel(
+            6,
+            1,
+            6,
+            1
+    );
+
 
     public BSplineParamPane(BSplinePane splinePane, BSplineEditor splineEditor) {
         super();
@@ -41,21 +55,36 @@ public class BSplineParamPane extends JPanel {
     }
 
     private JPanel getModelParametersPane() {
-        JPanel splineParametersPane = new JPanel();
-        splineParametersPane.setLayout(new BoxLayout(splineParametersPane, BoxLayout.PAGE_AXIS));
+        JPanel modelParametersPane = new JPanel();
+        modelParametersPane.setLayout(new BoxLayout(modelParametersPane, BoxLayout.PAGE_AXIS));
 
-        // Spline points per segment
-        JSpinner splinePointsPerSegmentSpinner = new JSpinner(splinePointsPerSegmentSpinnerModel);
-        splineParametersPane.add(getSpinnerPane("Points per spline segment", splinePointsPerSegmentSpinner));
+        // Rotation count
+        JSpinner rotationSpinner = new JSpinner(rotationSpinnerModel);
+        modelParametersPane.add(getSpinnerPane("Rotation count", rotationSpinner));
 
-        splinePointsPerSegmentSpinner.addChangeListener(l -> {
-            splinePane.setSplinePointsPerSegment((int) splinePointsPerSegmentSpinnerModel.getValue());
+        // Along-layer count
+        JSpinner alongLayersSpinner = new JSpinner(alongLayersSpinnerModel);
+        modelParametersPane.add(getSpinnerPane("Number of along-layers", alongLayersSpinner));
 
-            acrossLayersSpinnerModel.setMaximum(splinePane.getSpline().getSplinePoints().size());
-            acrossLayersSpinnerModel.setValue(Math.min((Integer) acrossLayersSpinnerModel.getNumber(), (Integer) acrossLayersSpinnerModel.getMaximum()));
+        // Rotation count
+        JSpinner acrossLayersSpinner = new JSpinner(acrossLayersSpinnerModel);
+        modelParametersPane.add(getSpinnerPane("Number of across-layers", acrossLayersSpinner));
+
+        rotationSpinner.addChangeListener(e -> {
+            alongLayersSpinnerModel.setMaximum((int) rotationSpinnerModel.getNumber());
+            alongLayersSpinnerModel.setValue(Math.min((Integer) alongLayersSpinnerModel.getNumber(), (Integer) alongLayersSpinnerModel.getMaximum()));
         });
 
-        return splineParametersPane;
+        splinePane.addPointModifiedListener((i, p) -> {
+            int splinePointCount = splinePane.getSpline().getSplinePoints().size();
+
+            acrossLayersSpinnerModel.setMaximum(splinePointCount);
+            acrossLayersSpinnerModel.setValue(Math.min((Integer) acrossLayersSpinnerModel.getNumber(), (Integer) acrossLayersSpinnerModel.getMaximum()));
+
+            return null;
+        });
+
+        return modelParametersPane;
     }
 
     private Component getSpinnerPane(String name, JSpinner spinner) {
@@ -92,8 +121,8 @@ public class BSplineParamPane extends JPanel {
         JSpinner ySpinner = new JSpinner(ySpinnerModel);
         keyPointParametersPane.add(getSpinnerPane("Y", ySpinner));
 
-        xSpinner.addChangeListener(c -> splinePane.setSelectedX((double)xSpinnerModel.getNumber()));
-        ySpinner.addChangeListener(c -> splinePane.setSelectedY((double)ySpinnerModel.getNumber()));
+        xSpinner.addChangeListener(c -> splinePane.setSelectedX((double) xSpinnerModel.getNumber()));
+        ySpinner.addChangeListener(c -> splinePane.setSelectedY((double) ySpinnerModel.getNumber()));
 
         splinePane.addPointModifiedListener((i, p) -> {
             if (i == -1) {
@@ -116,19 +145,21 @@ public class BSplineParamPane extends JPanel {
         return keyPointParametersPane;
     }
 
-    private JPanel getIndex() {
-        var indexPane = new JPanel();
-        indexPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        indexPane.add(new JLabel("Index: "));
-
-        var indexFiled = new JTextArea();
-        indexFiled.setEditable(false);
-        indexPane.add(indexFiled);
-
-        return indexPane;
-    }
-
     private JPanel getSplineParameterPane() {
-        return null;
+        JPanel splineParametersPane = new JPanel();
+        splineParametersPane.setLayout(new BoxLayout(splineParametersPane, BoxLayout.PAGE_AXIS));
+
+        // Spline points per segment
+        JSpinner splinePointsPerSegmentSpinner = new JSpinner(splinePointsPerSegmentSpinnerModel);
+        splineParametersPane.add(getSpinnerPane("Points per spline segment", splinePointsPerSegmentSpinner));
+
+        splinePointsPerSegmentSpinner.addChangeListener(l -> {
+            splinePane.setSplinePointsPerSegment((int) splinePointsPerSegmentSpinnerModel.getValue());
+
+            acrossLayersSpinnerModel.setMaximum(splinePane.getSpline().getSplinePoints().size());
+            acrossLayersSpinnerModel.setValue(Math.min((Integer) acrossLayersSpinnerModel.getNumber(), (Integer) acrossLayersSpinnerModel.getMaximum()));
+        });
+
+        return splineParametersPane;
     }
 }
