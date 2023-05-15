@@ -24,7 +24,7 @@ public class SceneView extends JPanel {
     public SceneView(SceneNode scene, CameraNode camera) {
         this.scene = scene;
         this.camera = camera;
-        this.focusNode = scene.getModelNode();
+        this.focusNode = scene.getModel();
 
         SceneView sceneView = this;
         MouseAdapter mouseAdapter = new MouseAdapter() {
@@ -99,7 +99,7 @@ public class SceneView extends JPanel {
     public void setScene(SceneNode scene, CameraNode camera) {
         this.scene = scene;
         this.camera = camera;
-        this.model = scene.getModelNode();
+        this.model = scene.getModel();
     }
 
     private Point getScreenPoint(Vector viewPortPoint) {

@@ -50,7 +50,7 @@ public class Node {
         this.localTranformMatrix = localTranformMatrix.rotate(axis, angle);
     }
 
-    public void setLocalTranformMatrix(Matrix matrix) {
+    public void setLocalTransformMatrix(Matrix matrix) {
         this.localTranformMatrix = matrix;
     }
 }

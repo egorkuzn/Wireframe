@@ -30,7 +30,7 @@ public class ViewerFrame extends JFrame {
 
         actions = new HashMap<>() {{
             put("Normalize view", e -> {
-                scene.getModel().setLocalTransform(new Matrix());
+                scene.getModel().setLocalTransformMatrix(new Matrix());
                 repaint();
             });
             put("BSpline editor", e -> {
@@ -42,7 +42,7 @@ public class ViewerFrame extends JFrame {
                         repaint();
                     }
                 });
-                splineEditor(m -> {
+                splineEditor.addSplineModelChangeListener(m -> {
                     scene.getModel().setModel(m);
                     repaint();
                     return null;

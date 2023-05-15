@@ -8,7 +8,7 @@ public class SceneNode extends Node {
 
     private ModelNode modelNode;
 
-    public ModelNode getMode() {
+    public ModelNode getModel() {
         return modelNode;
     }
 
