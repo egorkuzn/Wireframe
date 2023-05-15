@@ -2,6 +2,7 @@ package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
 
 import ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor.BSplineEditor;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
 
 import javax.swing.*;
@@ -11,6 +12,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
+import static java.awt.BorderLayout.PAGE_START;
+
 public class ViewerFrame extends JFrame {
     private HashMap<String, ActionListener> actions;
     private FileChooser fileChooser = new FileChooser(this);
@@ -18,7 +21,7 @@ public class ViewerFrame extends JFrame {
     private SceneView sceneView;
     private SceneNode scene;
 
-    public SceneViewerFrame(SceneNode sceneNode) {
+    public ViewerFrame(SceneNode sceneNode) {
         super("3D Scene Viewer");
 
         this.scene = sceneNode;
@@ -58,5 +61,24 @@ public class ViewerFrame extends JFrame {
                     setScene(scene, scene.getCameraList().get(0));
             });
         }};
+
+        var camera = scene.getCameraList().get(0);
+        sceneView = new SceneView(scene, camera);
+        add(sceneView);
+
+        var toolBar = new ToolBar(actions);
+        add(toolBar, PAGE_START);
+
+        var menuBar = new MenuBar(actions);
+        add(menuBar);
+
+        setScene(scene, camera);
+        pack();
+    }
+
+    public void setScene(SceneNode scene, CameraNode camera) {
+        this.scene = scene;
+        sceneView.setScene(scene, camera);
+        this.repaint();
     }
 }

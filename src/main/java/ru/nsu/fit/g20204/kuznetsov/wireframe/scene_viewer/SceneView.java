@@ -24,7 +24,7 @@ public class SceneView extends JPanel {
     public SceneView(SceneNode scene, CameraNode camera) {
         this.scene = scene;
         this.camera = camera;
-        this.focusNode = scene.getModel();
+        this.model = scene.getModel();
 
         SceneView sceneView = this;
         MouseAdapter mouseAdapter = new MouseAdapter() {
@@ -68,11 +68,17 @@ public class SceneView extends JPanel {
         this.repaint();
     }
 
-//    public void mouseWheelMoved(MouseWheelEvent e) {
-//        double offset = e.getPreciseWheelRotation() * zoomSpeed;
-//
-//        if (camera.getNearClipingPlane(camera.getNearClippingPlane() - offset))
-//    }
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        double offset = e.getPreciseWheelRotation() * zoomSpeed;
+
+        if (camera.getNearClippingPlane() <= 0 && offset >= 0)
+            return;
+
+        camera.setNearClippingPlane(camera.getNearClippingPlane() - offset);
+        camera.translate(0, 0, offset);
+
+        this.repaint();
+    }
 
     private void paintEdges(Graphics2D g2d, ArrayList<Vector> viewPortVertices, ArrayList<Integer> edgeList) {
         for (int i = 0; i < edgeList.size() / 2; i++) {
