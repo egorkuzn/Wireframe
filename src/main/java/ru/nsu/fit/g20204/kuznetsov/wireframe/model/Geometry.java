@@ -1,8 +1,24 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.model;
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class Geometry {
-    public Geometry(ArrayList<Object> vertexList, ArrayList<Integer> edgeList) {
+    private final List<Vector> vectorList;
+    private final List<Integer> edgeList;
+
+    public Geometry(ArrayList<Vector> vertexList, ArrayList<Integer> edgeList) {
+        this.vectorList = vertexList;
+        this.edgeList = edgeList;
+    }
+
+    public List<Vector> getVertecList() {
+        return vectorList;
+    }
+
+    public List<Integer> getEdgeList() {
+        return edgeList;
     }
 }
