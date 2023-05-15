@@ -27,6 +27,8 @@ public interface ModelFactory {
 
         var vertexList = new ArrayList<Vector>();
 
+        // Повернём каждую точку сплайна => получаем повенутый на угол сплайн
+        // Сделаем поворот на одинаковый угол - получим вращение
         for (var point: spline.getSplinePoints()) {
             for (int i = 0; i < rotationCount; i++) {
                 Matrix rotationMatrix = Matrix.getRotationMatrix(new Vector(1, 0,0, 1), 360 * (double) i / rotationCount);
@@ -34,9 +36,13 @@ public interface ModelFactory {
             }
         }
 
+        // У нас есть сплайн с готовыми точками. Из них нужно выбрать те, которые мы будем считать
+        // пересечениями с плоскостями
         var edgeList = new ArrayList<>(getSplineAcrossEdges(rotationCount, acrossLayerCount, spline.getSplinePoints().size()));
 
-
+        // Как получали вершины повернутых сплайнов, так и соединяем нужные
+        // Сначала идем по сплайну (возможно пропуская некоторые точки)
+        // Т.е. получается некоторая ось. После получения можем переходить к отрисовке следующей
         for (int splineIndex = 0; splineIndex < spline.getSplinePoints().size() - 1; splineIndex++) {
             for (int layer = 0; layer < alongLayerCount; layer ++) {
                 edgeList.add(splineIndex * rotationCount + layer * rotationCount / alongLayerCount);
@@ -51,7 +57,8 @@ public interface ModelFactory {
 
     static List<Integer> getSplineAcrossEdges(int rotationCount, int acrossLayerCount, int splineSize) {
         var edgeList = new ArrayList<Integer>();
-
+        // Т.к. полчаемый массив точек фигуры вращения получется сначала из вращения одной точки сплайна,
+        // то пересекающий сплайн первй слой будет [0; rotationCount].
         if (acrossLayerCount >= 1) {
             for (int vertexIndex = 0; vertexIndex < rotationCount; vertexIndex++) {
                 edgeList.add(vertexIndex);
@@ -64,8 +71,9 @@ public interface ModelFactory {
             }
         }
 
+        // Для случая нескольких слоёв мы просто будем "поднимать" первый.
         if (acrossLayerCount >= 2) {
-            int betweenStepSpace = (splineSize -acrossLayerCount) / (acrossLayerCount - 1);
+            int betweenStepSpace = (splineSize - acrossLayerCount) / (acrossLayerCount - 1);
             int extraBetweenSpace = (splineSize - acrossLayerCount) %  (acrossLayerCount - 1);
 
             int extraCount = 0;
@@ -75,7 +83,11 @@ public interface ModelFactory {
                     extraCount++;
                 }
 
-                for (int vertexIndex = (betweenStepSpace * layer + extraCount + layer) * rotationCount; vertexIndex < (betweenStepSpace * layer) * rotationCount + rotationCount; vertexIndex++) {
+                for (
+                        int vertexIndex = (betweenStepSpace * layer + extraCount + layer) * rotationCount;
+                        vertexIndex < (betweenStepSpace * layer) * rotationCount + rotationCount;
+                        vertexIndex++
+                ) {
                     edgeList.add(vertexIndex);
 
                     if ((vertexIndex + 1) % rotationCount == 0)
