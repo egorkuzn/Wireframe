@@ -8,4 +8,8 @@ public interface ModelParser {
     static SceneNode fileToScene(File file) {
 
     }
+
+    static boolean sceneToFile(SceneNode scene, File file) {
+        return true;
+    }
 }

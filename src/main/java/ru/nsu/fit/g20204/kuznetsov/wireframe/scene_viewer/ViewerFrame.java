@@ -53,6 +53,7 @@ public class ViewerFrame extends JFrame {
             });
             put("Open", e -> {
                 SceneNode scene = fileChooser.showOpenDialog();
+
                 if (scene != null)
                     setScene(scene, scene.getCameraList().get(0));
             });
