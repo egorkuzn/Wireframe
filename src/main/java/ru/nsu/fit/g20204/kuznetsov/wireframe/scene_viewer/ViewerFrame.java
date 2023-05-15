@@ -1,5 +1,6 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor.BSplineEditor;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
 
@@ -12,7 +13,7 @@ import java.util.HashMap;
 
 public class ViewerFrame extends JFrame {
     private HashMap<String, ActionListener> actions;
-    private FileChooser fileChooser = new FilewChooser(this);
+    private FileChooser fileChooser = new FileChooser(this);
 
     private SceneView sceneView;
     private SceneNode scene;
@@ -29,7 +30,7 @@ public class ViewerFrame extends JFrame {
 
         actions = new HashMap<>() {{
             put("Normalize view", e -> {
-                scene.getModelNode().setLocalTransform(new Matrix());
+                scene.getModel().setLocalTransform(new Matrix());
                 repaint();
             });
             put("BSpline editor", e -> {
@@ -37,12 +38,12 @@ public class ViewerFrame extends JFrame {
                 splineEditor.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        scene.getModelNode().setModel(splineEditor.getSplineModel());
+                        scene.getModel().setModel(splineEditor.getSplineModel());
                         repaint();
                     }
                 });
-                splineEditor.addSplineModelChangedListener(m -> {
-                    scene.getModelNode().setModel(m);
+                splineEditor(m -> {
+                    scene.getModel().setModel(m);
                     repaint();
                     return null;
                 });
