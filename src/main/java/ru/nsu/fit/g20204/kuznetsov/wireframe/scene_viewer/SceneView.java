@@ -102,8 +102,11 @@ public class SceneView extends JPanel {
         this.model = scene.getModelNode();
     }
 
-    private Point getScreenPoint() {
-        return
+    private Point getScreenPoint(Vector viewPortPoint) {
+        int x = (int)((viewPortPoint.x) * this.getWidth() / camera.getViewPortWidth()) + this.getWidth()/2;
+        int y = (int)((viewPortPoint.y) * this.getHeight() / camera.getViewPortHeight()) + this.getHeight()/2;
+
+        return new Point(x, y);
     }
 
     private Color getColorByDistance(Color color, double distance) {
