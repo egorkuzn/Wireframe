@@ -14,7 +14,7 @@ public class Geometry {
         this.edgeList = edgeList;
     }
 
-    public List<Vector> getVertecList() {
+    public List<Vector> getVertexList() {
         return vectorList;
     }
 
