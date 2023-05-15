@@ -6,7 +6,7 @@ import java.io.File;
 
 public interface ModelParser {
     static SceneNode fileToScene(File file) {
-
+        return new SceneNode(null);
     }
 
     static boolean sceneToFile(SceneNode scene, File file) {

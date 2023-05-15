@@ -13,6 +13,8 @@ import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 public class SceneView extends JPanel {
+    Color edgeColor = new Color(0, 0 , 0);
+
     private SceneNode scene;
     private CameraNode camera;
     private ModelNode model;
@@ -40,7 +42,13 @@ public class SceneView extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 sceneView.mouseWheelMoved(e);
             }
-        }
+        };
+
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
+        addMouseWheelListener(mouseAdapter);
+
+        repaint();
     }
 
     public void mousePressed(MouseEvent e) {
@@ -93,7 +101,7 @@ public class SceneView extends JPanel {
             Point screenPoint1 = getScreenPoint(viewPortPoint1);
             Point screenPoint2 = getScreenPoint(viewPortPoint2);
 
-            Color = getColorByDistance(edgeColor, Math.min(viewPortPoint1.z, viewPortPoint2.z));
+            Color color = getColorByDistance(edgeColor, Math.min(viewPortPoint1.z, viewPortPoint2.z));
 
             g2d.setColor(color);
             g2d.setStroke(new BasicStroke((int) (5 * (1 - Math.min(viewPortPoint1.z, viewPortPoint2.z))), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
