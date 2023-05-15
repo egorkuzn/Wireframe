@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface ModelFactory {
-    static Geometry createRoatedSplineModel(BSpline spline, int rotationCount, int alongLayerCount, int acrossLayerCount) throws IllegalArgumentException {
+    static Geometry createRoutedSplineModel(BSpline spline, int rotationCount, int alongLayerCount, int acrossLayerCount) throws IllegalArgumentException {
         if (spline.getSplinePoints().isEmpty()) {
             return null;
         }
@@ -25,7 +25,7 @@ public interface ModelFactory {
             throw new IllegalArgumentException("alongLayerCount " + alongLayerCount + " can't be zero");
         }
 
-        var vertexList = new ArrayList<>();
+        var vertexList = new ArrayList<Vector>();
 
         for (var point: spline.getSplinePoints()) {
             for (int i = 0; i < rotationCount; i++) {

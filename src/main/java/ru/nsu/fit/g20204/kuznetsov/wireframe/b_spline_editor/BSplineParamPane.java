@@ -153,6 +153,6 @@ public class BSplineParamPane extends JPanel {
         int alongLayerCount = (int) alongLayersSpinnerModel.getNumber();
         int acrossLayerCount = (int) acrossLayersSpinnerModel.getNumber();
 
-        return ModelFactory.createRoatedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount);
+        return ModelFactory.createRoutedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount);
     }
 }

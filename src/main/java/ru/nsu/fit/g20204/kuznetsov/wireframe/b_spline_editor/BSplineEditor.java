@@ -2,6 +2,8 @@ package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor;
 
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
 
 import javax.swing.*;
 import java.awt.*;
