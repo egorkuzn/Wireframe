@@ -1,6 +1,7 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor;
 
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,7 @@ import java.util.function.Function;
 public class BSplineEditor extends JFrame {
     private final BSplinePane splinePane = new BSplinePane();
     private final BSplineParamPane paramPane = new BSplineParamPane(splinePane, this);
-    private final List<Function<>> splineChangedListeners = new ArrayList<>();
+    private final List<Function<Geometry, Void>> splineChangedListeners = new ArrayList<>();
 
 
     public BSplineEditor() {
@@ -30,8 +31,16 @@ public class BSplineEditor extends JFrame {
         return splinePane.getSpline();
     }
 
+    public Geometry getSplineModel() {
+        return paramPane.getSplineModel();
+    }
+
+    public void addSplineModelChangeListener(Function<Geometry, Void> listener) {
+        splineChangedListeners.add(listener);
+    }
+
     public void applySpline() {
-        for (var l : splineChangedListener) {
+        for (var l : splineChangedListeners) {
             l.apply(paramPane.getSplineModel());
         }
     }

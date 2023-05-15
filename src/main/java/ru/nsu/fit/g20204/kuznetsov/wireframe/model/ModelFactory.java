@@ -88,8 +88,4 @@ public interface ModelFactory {
 
         return edgeList;
     }
-
-
-
-
 }

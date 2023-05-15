@@ -1,38 +1,21 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor;
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.*;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class BSplineParamPane extends JPanel {
     private final BSplinePane splinePane;
 
-    private final SpinnerNumberModel splinePointsPerSegmentSpinnerModel = new SpinnerNumberModel(
-            10,
-            2,
-            100,
-            1
-    );
+    private final SpinnerNumberModel splinePointsPerSegmentSpinnerModel = new SpinnerNumberModel(10, 2, 100, 1);
 
-    private final SpinnerNumberModel acrossLayersSpinnerModel = new SpinnerNumberModel(
-            0,
-            0,
-            0,
-            1
-    );
+    private final SpinnerNumberModel acrossLayersSpinnerModel = new SpinnerNumberModel(0, 0, 0, 1);
 
-    private final SpinnerNumberModel rotationSpinnerModel = new SpinnerNumberModel(
-            6,
-            1,
-            360,
-            1
-    );
+    private final SpinnerNumberModel rotationSpinnerModel = new SpinnerNumberModel(6, 1, 360, 1);
 
-    private final SpinnerNumberModel alongLayersSpinnerModel = new SpinnerNumberModel(
-            6,
-            1,
-            6,
-            1
-    );
+    private final SpinnerNumberModel alongLayersSpinnerModel = new SpinnerNumberModel(6, 1, 6, 1);
 
 
     public BSplineParamPane(BSplinePane splinePane, BSplineEditor splineEditor) {
@@ -163,6 +146,13 @@ public class BSplineParamPane extends JPanel {
         return splineParametersPane;
     }
 
-    public Object getSplineModel() {
+    public Geometry getSplineModel() throws IllegalArgumentException {
+        BSpline spline = splinePane.getSpline();
+
+        int rotatingCount = (int) rotationSpinnerModel.getNumber();
+        int alongLayerCount = (int) alongLayersSpinnerModel.getNumber();
+        int acrossLayerCount = (int) acrossLayersSpinnerModel.getNumber();
+
+        return ModelFactory.createRoatedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount);
     }
 }
