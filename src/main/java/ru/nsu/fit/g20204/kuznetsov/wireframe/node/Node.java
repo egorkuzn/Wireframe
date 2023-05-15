@@ -31,6 +31,13 @@ public class Node {
         return localTranformMatrix;
     }
 
+    public Matrix getGlobalTransform() {
+        if (parentNode == null) {
+            return  localTranformMatrix;
+        }
+
+        return parentNode.getGlobalTransform().multiply(localTranformMatrix);
+    }
     public void translate(double dx, double dy, double dz) {
         localTranformMatrix = localTranformMatrix.translate(dx, dy, dz);
     }
