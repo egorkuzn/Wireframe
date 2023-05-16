@@ -30,7 +30,7 @@ public class Main {
         scene.addChild(modelNode);
         scene.setModel(modelNode);
 
-        modelNode.setModel(ModelFactory.createCube());
+        modelNode.setModel(new Geometry());
 
         camera = scene.createCameraNode();
         camera.translate(0, 0, -5);

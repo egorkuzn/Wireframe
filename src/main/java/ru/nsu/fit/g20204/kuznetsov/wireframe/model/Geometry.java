@@ -12,7 +12,8 @@ public class Geometry {
     public Geometry() {
         vectorList = new ArrayList<>();
         edgeList = new ArrayList<>();
-        vectorList.add(new Vector());
+        vectorList.add(new Vector(1, 1, 1, 1));
+        vectorList.add(new Vector(0, 0, 0, 1));
     }
 
     public Geometry(List<Vector> vertexList, List<Integer> edgeList) {

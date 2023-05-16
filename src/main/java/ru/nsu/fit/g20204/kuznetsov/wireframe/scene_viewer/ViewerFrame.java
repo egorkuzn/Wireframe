@@ -1,5 +1,6 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
 
+import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkIJTheme;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor.BSplineEditor;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
@@ -26,6 +27,8 @@ public class ViewerFrame extends JFrame {
 
         scene = sceneNode;
 
+        FlatAtomOneDarkIJTheme.setup();
+        SwingUtilities.updateComponentTreeUI(this);
 
         setMinimumSize(new Dimension(640, 480));
         setLocation(400, 160);
