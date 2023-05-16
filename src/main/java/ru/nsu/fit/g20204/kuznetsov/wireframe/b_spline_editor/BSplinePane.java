@@ -218,10 +218,10 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (dragPointIndex != -1) {
-            keyPointDrag(e);
-        } else if (dragOrigin != null) {
+        if (dragOrigin != null) {
             paneDrag(e);
+        } else if (dragPointIndex != -1) {
+            keyPointDrag(e);
         }
 
         repaint();
@@ -338,13 +338,17 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+        dragOrigin = null;
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        dragOrigin = null;
+    }
 
     @Override
     public void mouseEntered(MouseEvent e) {}
-
-    @Override
-    public void mouseExited(MouseEvent e) {}
 
     public BSpline getSpline() {
         return spline;
