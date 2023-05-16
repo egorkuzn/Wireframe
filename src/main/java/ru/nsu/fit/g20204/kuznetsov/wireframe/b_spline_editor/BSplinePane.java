@@ -192,7 +192,6 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     private int findSelectedKeyPoint(Point point) {
         for (int pointIndex = 0; pointIndex < spline.getKeyPoints().size(); pointIndex++) {
-            System.out.println(spline.getKeyPoints().size());
             Point2D.Double keyPoint = spline.getKeyPoints().get(pointIndex);
 
             Point pointOnScreen = this.getPointOnScreen(keyPoint.x, keyPoint.y);
@@ -219,13 +218,13 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (dragOrigin != null) {
-            paneDrag(e);
-        } else if (dragPointIndex != -1) {
+        if (dragPointIndex != -1) {
             keyPointDrag(e);
+        } else if (dragOrigin != null) {
+            paneDrag(e);
         }
 
-        this.repaint();
+        repaint();
     }
 
     @Override
