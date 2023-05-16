@@ -4,8 +4,14 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * В данном коде описана алгебра B-сплайна
+ */
 public class BSpline {
     private static final int DEFAULT_SEGMENT_SIZE = 10;
+    /**
+     * @splineMatrix - матрица B-сплайна
+     */
     private static final Matrix splineMatrix = new Matrix(
             new double[][]{
                     {-1, 3, -3, 1},
@@ -58,13 +64,17 @@ public class BSpline {
         evaluateSpline();
     }
 
+    /**
+     * В теории i = 2 .. N - 2
+     * Но т.к. счёт индексов осуществляется с 0
+     * то i = 1
+     */
     public void evaluateSpline() {
         splinePointList.clear();
 
         if (keyPointList.size() < 4)
             return;
 
-        // For each 4 neighbouring key points
         for (int i = 1; i < keyPointList.size() - 2; i++) {
             // Get polynomial coefficients by multiplying the spline matrix by component vectors
             Vector xCoefficients = splineMatrix.multiply(getXComponents(i), false);
@@ -73,6 +83,13 @@ public class BSpline {
         }
     }
 
+    /**
+     * У нас в модели имеется <code>keyPointList</code>, которая уже хранит
+     * все управляющие точки.
+     * @param i проходимся по каждой управляющей точке и берём 3 следующие.
+     *          Таким образом это есть участок, в котором строится сплайн
+     * @return тем самым получаем Pi .. Pi+3 вектор
+     */
     private Vector getXComponents(int i) {
         return new Vector(
                 keyPointList.get(i-1).x,

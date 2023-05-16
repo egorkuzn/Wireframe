@@ -24,12 +24,12 @@ public class ViewerFrame extends JFrame {
     public ViewerFrame(SceneNode sceneNode) {
         super("3D Scene Viewer");
 
-        this.scene = sceneNode;
+        scene = sceneNode;
 
 
-        this.setMinimumSize(new Dimension(640, 480));
-        this.setLocation(400, 160);
-        this.setVisible(true);
+        setMinimumSize(new Dimension(640, 480));
+        setLocation(400, 160);
+        setVisible(true);
 
         actions = new HashMap<>() {{
             put("Normalize view", e -> {
@@ -66,11 +66,11 @@ public class ViewerFrame extends JFrame {
         sceneView = new SceneView(scene, camera);
         add(sceneView);
 
-        var menuBar = new MenuBar(actions);
-        add(menuBar);
-
         var toolBar = new ToolBar(actions);
         add(toolBar, PAGE_START);
+
+        var menuBar = new MenuBar(actions);
+        setJMenuBar(menuBar);
 
         setScene(scene, camera);
         pack();
