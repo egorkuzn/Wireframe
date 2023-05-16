@@ -29,9 +29,9 @@ public interface ModelFactory {
 
         // Повернём каждую точку сплайна => получаем повенутый на угол сплайн
         // Сделаем поворот на одинаковый угол - получим вращение
-        for (var point: spline.getSplinePoints()) {
+        for (var point : spline.getSplinePoints()) {
             for (int i = 0; i < rotationCount; i++) {
-                Matrix rotationMatrix = Matrix.getRotationMatrix(new Vector(1, 0,0, 1), 360 * (double) i / rotationCount);
+                Matrix rotationMatrix = Matrix.getRotationMatrix(new Vector(1, 0, 0, 1), 360 * (double) i / rotationCount);
                 vertexList.add(rotationMatrix.multiply(new Vector(point.x, point.y, 0, 1), true));
             }
         }
@@ -44,7 +44,7 @@ public interface ModelFactory {
         // Сначала идем по сплайну (возможно пропуская некоторые точки)
         // Т.е. получается некоторая ось. После получения можем переходить к отрисовке следующей
         for (int splineIndex = 0; splineIndex < spline.getSplinePoints().size() - 1; splineIndex++) {
-            for (int layer = 0; layer < alongLayerCount; layer ++) {
+            for (int layer = 0; layer < alongLayerCount; layer++) {
                 edgeList.add(splineIndex * rotationCount + layer * rotationCount / alongLayerCount);
                 edgeList.add((splineIndex + 1) * rotationCount + layer * rotationCount / alongLayerCount);
             }
@@ -52,7 +52,6 @@ public interface ModelFactory {
 
         return new Geometry(vertexList, edgeList);
     }
-
 
 
     static List<Integer> getSplineAcrossEdges(int rotationCount, int acrossLayerCount, int splineSize) {
@@ -74,7 +73,7 @@ public interface ModelFactory {
         // Для случая нескольких слоёв мы просто будем "поднимать" первый.
         if (acrossLayerCount >= 2) {
             int betweenStepSpace = (splineSize - acrossLayerCount) / (acrossLayerCount - 1);
-            int extraBetweenSpace = (splineSize - acrossLayerCount) %  (acrossLayerCount - 1);
+            int extraBetweenSpace = (splineSize - acrossLayerCount) % (acrossLayerCount - 1);
 
             int extraCount = 0;
 
@@ -99,5 +98,60 @@ public interface ModelFactory {
         }
 
         return edgeList;
+    }
+
+    static Geometry createCube() {
+        // Create vertices and edges
+        List<Vector> vertexList = new ArrayList<>();
+        List<Integer> edgeList = new ArrayList<>();
+
+        // Create vertices
+        for (double i = -1; i <= 1; i += 2) {
+            for (double j = -1; j <= 1; j += 2) {
+                for (double k = -1; k <= 1; k += 2) {
+                    vertexList.add(new Vector(i, j, k, 1));
+                }
+            }
+        }
+
+        // TODO: Can't it be more elegant?
+        // Connect vertices with edges
+        edgeList.add(0);
+        edgeList.add(1);
+
+        edgeList.add(0);
+        edgeList.add(2);
+
+        edgeList.add(0);
+        edgeList.add(4);
+
+        edgeList.add(1);
+        edgeList.add(3);
+
+        edgeList.add(1);
+        edgeList.add(5);
+
+        edgeList.add(2);
+        edgeList.add(3);
+
+        edgeList.add(2);
+        edgeList.add(6);
+
+        edgeList.add(3);
+        edgeList.add(7);
+
+        edgeList.add(4);
+        edgeList.add(5);
+
+        edgeList.add(4);
+        edgeList.add(6);
+
+        edgeList.add(5);
+        edgeList.add(7);
+
+        edgeList.add(6);
+        edgeList.add(7);
+
+        return new Geometry(vertexList, edgeList);
     }
 }

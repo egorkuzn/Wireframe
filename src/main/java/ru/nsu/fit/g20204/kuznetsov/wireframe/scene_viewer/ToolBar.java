@@ -13,7 +13,7 @@ public class ToolBar extends JToolBar {
         this.add(openButton);
         openButton.addActionListener(actions.get("Open"));
 
-        JButton saveButton = new JButton("Save button");
+        JButton saveButton = new JButton("Save scene");
         this.add(saveButton);
         saveButton.addActionListener(actions.get("Save"));
 

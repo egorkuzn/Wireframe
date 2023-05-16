@@ -1,14 +1,12 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe;
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer.ViewerFrame;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.*;
 
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class Main {
     static ModelNode modelNode;
@@ -31,7 +29,8 @@ public class Main {
         modelNode = new ModelNode(scene);
         scene.addChild(modelNode);
         scene.setModel(modelNode);
-        modelNode.setModel(new Geometry());
+
+        modelNode.setModel(ModelFactory.createCube());
 
         camera = scene.createCameraNode();
         camera.translate(0, 0, -5);

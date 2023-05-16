@@ -26,8 +26,8 @@ public class SceneView extends JPanel {
     private ModelNode model;
 
     private Point rotateScreenOrigin;
-    private double rotationSpeed = 3;
-    private double zoomSpeed = 0.1;
+    private static final double rotationSpeed = 3;
+    private static final double zoomSpeed = 0.1;
 
     public SceneView(SceneNode scene, CameraNode camera) {
         this.scene = scene;
@@ -123,8 +123,8 @@ public class SceneView extends JPanel {
     }
 
     private Point getScreenPoint(Vector viewPortPoint) {
-        int x = (int)((viewPortPoint.x) * this.getWidth() / camera.getViewPortWidth()) + this.getWidth()/2;
-        int y = (int)((viewPortPoint.y) * this.getHeight() / camera.getViewPortHeight()) + this.getHeight()/2;
+        int x = (int)((viewPortPoint.x) * this.getWidth() / camera.getViewPortWidth()) + this.getWidth() / 2;
+        int y = (int)((viewPortPoint.y) * this.getHeight() / camera.getViewPortHeight()) + this.getHeight() / 2;
 
         return new Point(x, y);
     }
@@ -150,24 +150,29 @@ public class SceneView extends JPanel {
 
         if (this.getWidth() < this.getHeight()) {
             camera.setViewPortWidth(1.5);
-            camera.setViewPortHeight(1.5 * getHeight() / this.getWidth());
+            camera.setViewPortHeight(1.5 * getHeight() / getWidth());
         } else {
             camera.setViewPortHeight(1.5);
-            camera.setViewPortWidth(1.5 * getWidth() / this.getHeight());
+            camera.setViewPortWidth(1.5 * getWidth() / getHeight());
         }
 
-        BufferedImage bufferedImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage bufferedImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
 
         Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();
         imageGraphics.setColor(new Color(169, 169, 169));
         imageGraphics.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
 
-        this.paintNode(bufferedImage, scene);
+        paintNode(bufferedImage, scene);
 
-        g2d.drawImage(bufferedImage, (this.getWidth() - bufferedImage.getWidth())/ 2, (this.getHeight() - bufferedImage.getHeight())/ 2, this);
+        g2d.drawImage(bufferedImage, (getWidth() - bufferedImage.getWidth())/ 2, (getHeight() - bufferedImage.getHeight())/ 2, this);
 
         g2d.setColor(Color.WHITE);
-        g2d.drawRect((this.getWidth() - bufferedImage.getWidth())/2,  (this.getHeight() - bufferedImage.getHeight())/2, bufferedImage.getWidth()-1, bufferedImage.getHeight()-1);
+        g2d.drawRect (
+                (getWidth() - bufferedImage.getWidth())/2,
+                (getHeight() - bufferedImage.getHeight())/2,
+                bufferedImage.getWidth() - 1,
+                bufferedImage.getHeight() - 1
+        );
     }
 
     private void paintNode(BufferedImage bufferedImage, Node node) {
@@ -195,10 +200,12 @@ public class SceneView extends JPanel {
                 g.setColor(color);
                 Vector viewPortAxis = projectionMatrix.multiply(vector, true);
                 Point screenPointAxis = getScreenPoint(viewPortAxis);
-                g.drawLine(screenPointCenter.x,
+                g.drawLine (
+                        screenPointCenter.x,
                         screenPointCenter.y,
                         screenPointAxis.x,
-                        screenPointAxis.y);
+                        screenPointAxis.y
+                );
                 return null;
             };
 
@@ -207,15 +214,11 @@ public class SceneView extends JPanel {
             paintAxis.apply(new Vector(0, 0, 1, 1), Color.BLUE);
 
             List<Vector> viewPortVertices = new ArrayList<>();
+
             for (var vertex: geometry.getVertexList()) {
                 viewPortVertices.add(projectionMatrix.multiply(vertex, true));
             }
 
-            g.setColor(Color.WHITE);
-            g.setStroke(new BasicStroke(2));
-
-            g.setColor(Color.WHITE);
-            g.setStroke(new BasicStroke(1));
             paintEdges(g, viewPortVertices, geometry.getEdgeList());
         }
 

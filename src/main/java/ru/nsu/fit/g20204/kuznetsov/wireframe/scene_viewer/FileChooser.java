@@ -16,7 +16,7 @@ public class FileChooser {
 
     public SceneNode showOpenDialog() {
         FileDialog fileDialog = new FileDialog(parentFrame, "Open scene", FileDialog.LOAD);
-        fileDialog.setFile("*.icg");
+        fileDialog.setFile("*.graphics");
         fileDialog.setVisible(true);
 
         if(fileDialog.getFile() != null) {

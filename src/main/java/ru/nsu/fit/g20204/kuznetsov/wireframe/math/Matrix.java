@@ -12,7 +12,7 @@ public class Matrix {
     public Matrix() {
         matrix = new double[][] {
                 {1, 0, 0, 0},
-                {1, 1, 0, 0},
+                {0, 1, 0, 0},
                 {0, 0, 1, 0},
                 {0, 0, 0, 1}
         };
