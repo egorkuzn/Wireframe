@@ -1,8 +1,11 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.Node;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
 
 import javax.swing.*;
@@ -10,7 +13,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class SceneView extends JPanel {
     Color edgeColor = new Color(0, 0 , 0);
@@ -88,7 +94,7 @@ public class SceneView extends JPanel {
         this.repaint();
     }
 
-    private void paintEdges(Graphics2D g2d, ArrayList<Vector> viewPortVertices, ArrayList<Integer> edgeList) {
+    private void paintEdges(Graphics2D g2d, List<Vector> viewPortVertices, List<Integer> edgeList) {
         for (int i = 0; i < edgeList.size() / 2; i++) {
             Vector viewPortPoint1 = viewPortVertices.get(edgeList.get(2 * i));
             Vector viewPortPoint2 = viewPortVertices.get(edgeList.get(2 * i + 1));
@@ -135,5 +141,86 @@ public class SceneView extends JPanel {
         int newRgb = (0xFF << 24) | (red << 16) | (green << 8) | blue;
 
         return new Color(newRgb);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D)g;
+
+        if (this.getWidth() < this.getHeight()) {
+            camera.setViewPortWidth(1.5);
+            camera.setViewPortHeight(1.5 * getHeight() / this.getWidth());
+        } else {
+            camera.setViewPortHeight(1.5);
+            camera.setViewPortWidth(1.5 * getWidth() / this.getHeight());
+        }
+
+        BufferedImage bufferedImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D imageGraphics = (Graphics2D) bufferedImage.getGraphics();
+        imageGraphics.setColor(new Color(169, 169, 169));
+        imageGraphics.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+
+        this.paintNode(bufferedImage, scene);
+
+        g2d.drawImage(bufferedImage, (this.getWidth() - bufferedImage.getWidth())/ 2, (this.getHeight() - bufferedImage.getHeight())/ 2, this);
+
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect((this.getWidth() - bufferedImage.getWidth())/2,  (this.getHeight() - bufferedImage.getHeight())/2, bufferedImage.getWidth()-1, bufferedImage.getHeight()-1);
+    }
+
+    private void paintNode(BufferedImage bufferedImage, Node node) {
+        if (node instanceof ModelNode modelNode) {
+            Matrix modelNodeGlobalTransform = modelNode.getGlobalTransform();
+            Matrix modelScaleTransform = modelNode.getBoundBoxMatrix();
+            Matrix cameraGlobalTransform = camera.getGlobalTransform();
+            Matrix cameraViewportTransform = camera.getViewportTransform();
+
+            Matrix projectionMatrix = cameraViewportTransform.multiply(
+                    cameraGlobalTransform.multiply(
+                            modelScaleTransform.multiply(
+                                    modelNodeGlobalTransform)));
+
+            Geometry geometry = modelNode.getModel();
+
+            Graphics2D g =  (Graphics2D) bufferedImage.getGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            Vector center = new Vector(0, 0, 0, 1);
+            Vector viewPortCenter = projectionMatrix.multiply(center, true);
+            Point screenPointCenter = getScreenPoint(viewPortCenter);
+
+            BiFunction<Vector, Color, Void> paintAxis = (Vector vector, Color color) -> {
+                g.setColor(color);
+                Vector viewPortAxis = projectionMatrix.multiply(vector, true);
+                Point screenPointAxis = getScreenPoint(viewPortAxis);
+                g.drawLine(screenPointCenter.x,
+                        screenPointCenter.y,
+                        screenPointAxis.x,
+                        screenPointAxis.y);
+                return null;
+            };
+
+            paintAxis.apply(new Vector(1, 0, 0, 1), Color.RED);
+            paintAxis.apply(new Vector(0, 1, 0, 1), Color.GREEN);
+            paintAxis.apply(new Vector(0, 0, 1, 1), Color.BLUE);
+
+            List<Vector> viewPortVertices = new ArrayList<>();
+            for (var vertex: geometry.getVertexList()) {
+                viewPortVertices.add(projectionMatrix.multiply(vertex, true));
+            }
+
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(2));
+
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(1));
+            paintEdges(g, viewPortVertices, geometry.getEdgeList());
+        }
+
+        for (var childNode: node.getChildNodes()) {
+            paintNode(bufferedImage, childNode);
+        }
     }
 }

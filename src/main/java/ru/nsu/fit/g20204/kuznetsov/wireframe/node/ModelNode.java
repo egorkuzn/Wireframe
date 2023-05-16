@@ -21,7 +21,7 @@ public class ModelNode extends Node {
     }
 
     // Получаем матрицу, чтобы моделька вмещалась в бокс
-    public Matrix getBoundBoxModel() {
+    public Matrix getBoundBoxMatrix() {
         double xMax= model.getVertexList().get(0).x;
         double yMax = model.getVertexList().get(0).y;
         double zMax = model.getVertexList().get(0).z;

@@ -66,11 +66,11 @@ public class ViewerFrame extends JFrame {
         sceneView = new SceneView(scene, camera);
         add(sceneView);
 
-        var toolBar = new ToolBar(actions);
-        add(toolBar, PAGE_START);
-
         var menuBar = new MenuBar(actions);
         add(menuBar);
+
+        var toolBar = new ToolBar(actions);
+        add(toolBar, PAGE_START);
 
         setScene(scene, camera);
         pack();

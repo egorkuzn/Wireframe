@@ -3,13 +3,31 @@ package ru.nsu.fit.g20204.kuznetsov.wireframe;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode;
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
+import ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer.ViewerFrame;
+
+import javax.swing.*;
 
 public class Main {
-    private static ModelNode model;
-    private static CameraNode camera;
+    static ModelNode modelNode;
+    static CameraNode camera;
 
     public static void main(String[] args) {
-        var scene = new SceneNode(null);
-        camera = scene.getCameraNode();
+        run();
+    }
+
+    private static void run() {
+        SceneNode scene = createScene();
+
+        ViewerFrame sceneViewer = new ViewerFrame(scene);
+        sceneViewer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    private static SceneNode createScene() {
+        SceneNode scene = new SceneNode(null);
+
+        camera = scene.createCameraNode();
+        camera.translate(0, 0, -5);
+
+        return scene;
     }
 }
