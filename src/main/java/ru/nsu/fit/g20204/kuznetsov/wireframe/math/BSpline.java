@@ -129,6 +129,10 @@ public class BSpline {
         }
     }
 
+    public List<Point2D.Double> getKeyPointList() {
+        return keyPointList;
+    }
+
     public List<Point2D.Double> getSplinePoints() {
         return splinePointList;
     }

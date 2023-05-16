@@ -16,9 +16,9 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     public BSplinePane() {
         super();
-        this.addMouseListener(this);
-        this.addMouseWheelListener(this);
-        this.addMouseMotionListener(this);
+        addMouseWheelListener(this);
+        addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     private Color backgroundColor = new Color(169, 169, 169);
@@ -53,7 +53,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(backgroundColor);
-        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+        g2d.fillRect(0, 0, getWidth(), getHeight());
 
         paintAxes(g2d);
         paintSpline(g2d);
@@ -65,8 +65,8 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
     private void paintAxes(Graphics2D g2d) {
         g2d.setStroke(new BasicStroke(axisSize));
 
-        verticalPosition = this.getWidth() / 2 + verticalOffset;
-        horizontalPosition = this.getWidth() / 2 + horizontalOffset;
+        verticalPosition = getHeight() / 2 + verticalOffset;
+        horizontalPosition = getWidth() / 2 + horizontalOffset;
 
         paintXAxes(g2d);
         paintYAxes(g2d);
@@ -74,9 +74,9 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     private void paintXAxes(Graphics2D g2d) {
         g2d.setColor(xAxisColor);
-        g2d.drawLine(0, verticalPosition, this.getWidth() - 1, verticalPosition);
+        g2d.drawLine(0, verticalPosition, getWidth() - 1, verticalPosition);
 
-        for (int i = horizontalPosition + pixelsPerIndentStep; i <= this.getWidth(); i += pixelsPerIndentStep) {
+        for (int i = horizontalPosition + pixelsPerIndentStep; i <= getWidth(); i += pixelsPerIndentStep) {
             g2d.drawLine(i, verticalPosition - axisSize * 2, i, verticalPosition + axisSize * 2);
         }
 
@@ -192,6 +192,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
 
     private int findSelectedKeyPoint(Point point) {
         for (int pointIndex = 0; pointIndex < spline.getKeyPoints().size(); pointIndex++) {
+            System.out.println(spline.getKeyPoints().size());
             Point2D.Double keyPoint = spline.getKeyPoints().get(pointIndex);
 
             Point pointOnScreen = this.getPointOnScreen(keyPoint.x, keyPoint.y);
@@ -314,7 +315,7 @@ public class BSplinePane extends JPanel implements MouseWheelListener, MouseMoti
         dragPointIndex = spline.getKeyPoints().size() - 1;
 
         for (var l: pointModifiedListeners) {
-            l.apply(dragPointIndex, spline.getSplinePoints().get(dragPointIndex));
+            l.apply(dragPointIndex, spline.getKeyPointList().get(dragPointIndex));
         }
     }
 
