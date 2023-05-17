@@ -7,16 +7,16 @@ import javax.swing.JToolBar
 class ToolBar(actions: HashMap<String, ActionListener>) : JToolBar() {
     init {
         this.isFloatable = false
-        val openButton = JButton("Open scene")
+        val openButton = ToolButton("icon/open.png" ,"Open scene")
         this.add(openButton)
         openButton.addActionListener(actions["Open"])
-        val saveButton = JButton("Save scene")
+        val saveButton = ToolButton("icon/save.png", "Save scene")
         this.add(saveButton)
         saveButton.addActionListener(actions["Save"])
-        val editorButton = JButton("BSpline editor")
+        val editorButton = ToolButton("icon/edit.png","BSpline editor")
         this.add(editorButton)
         editorButton.addActionListener(actions["BSpline editor"])
-        val normalizeViewButton = JButton("Normalize view")
+        val normalizeViewButton = ToolButton("icon/normalise.png", "Normalize view")
         this.add(normalizeViewButton)
         normalizeViewButton.addActionListener(actions["Normalize view"])
     }

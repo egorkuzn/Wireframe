@@ -1,6 +1,5 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.util
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.Main
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Vector
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
@@ -20,7 +19,8 @@ interface ModelParser {
                     modelNode.model = streamToGeometry(input)
                     scene.addChild(modelNode)
                     scene.model = modelNode
-                    scene.createCameraNode()
+                    val camera = scene.createCameraNode()
+                    camera.translate(0.0, 0.0, -5.0)
                     return scene
                 }
             } catch (e: IOException) {

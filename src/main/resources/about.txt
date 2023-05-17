@@ -1,0 +1,19 @@
+3D wireframe model viewer
+
+Simple viewer that allows you to visualise models based on spline.
+Rotate, zoom, create new figures and enjoy!
+
+| MAIN SCENE
+
+* Use OPEN SCENE for using 3D models that already created
+* Click SAVE SCENE if you need to save you work in file
+* BSPLINE EDITOR opens editor window
+* NORMALIZE VIEW set figure to initial state
+
+For axes orienteering use red (X), green (Y) and blue (Z) lines.
+Use mouse to rotate your model and mouse wheel for zoom.
+
+| SPLINE EDITOR
+
+Editor has pane for param input and
+

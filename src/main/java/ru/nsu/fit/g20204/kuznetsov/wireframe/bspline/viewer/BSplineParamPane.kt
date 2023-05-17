@@ -142,7 +142,6 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
             val rotatingCount = rotationSpinnerModel.number as Int
             val alongLayerCount = alongLayersSpinnerModel.number as Int
             val acrossLayerCount = acrossLayersSpinnerModel.number as Int
-            println(acrossLayerCount)
             return ModelFactory.createRoutedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount)
         }
 }

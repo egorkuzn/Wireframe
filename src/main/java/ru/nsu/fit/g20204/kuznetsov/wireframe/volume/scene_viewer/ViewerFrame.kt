@@ -12,6 +12,7 @@ import java.awt.event.ActionListener
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
+import javax.swing.UIManager
 
 class ViewerFrame(private var scene: SceneNode) : JFrame("3D Scene Viewer") {
     private val actions: HashMap<String, ActionListener>
@@ -19,6 +20,8 @@ class ViewerFrame(private var scene: SceneNode) : JFrame("3D Scene Viewer") {
     private val sceneView: SceneView
 
     init {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+
         minimumSize = Dimension(640, 480)
         setLocation(400, 160)
         isVisible = true
@@ -48,6 +51,7 @@ class ViewerFrame(private var scene: SceneNode) : JFrame("3D Scene Viewer") {
                 })
             }
         }
+
         val camera = scene.cameraList[0]
         sceneView = SceneView(scene, camera)
         add(sceneView)
