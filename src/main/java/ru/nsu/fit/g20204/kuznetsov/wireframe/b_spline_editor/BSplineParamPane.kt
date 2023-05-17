@@ -1,5 +1,15 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.ModelFactory
+import java.awt.Component
+import java.awt.FlowLayout
+import java.awt.event.ActionEvent
+import java.awt.geom.Point2D
+import javax.swing.*
+import javax.swing.event.ChangeEvent
+import kotlin.math.min
+
 class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplineEditor) : JPanel() {
     private val splinePointsPerSegmentSpinnerModel = SpinnerNumberModel(10, 2, 100, 1)
     private val acrossLayersSpinnerModel = SpinnerNumberModel(0, 0, 0, 1)
@@ -19,12 +29,12 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
 
     private fun getApplyButton(splineEditor: BSplineEditor): JButton {
         val applyButton = JButton("Apply")
-        applyButton.addActionListener { e: ActionEvent? -> splineEditor.applySpline() }
+        applyButton.addActionListener { _: ActionEvent -> splineEditor.applySpline() }
         return applyButton
     }
 
     private val modelParametersPane: JPanel
-        private get() {
+        get() {
             val modelParametersPane = JPanel()
             modelParametersPane.layout = BoxLayout(modelParametersPane, BoxLayout.PAGE_AXIS)
 
@@ -39,17 +49,16 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
             // Rotation count
             val acrossLayersSpinner = JSpinner(acrossLayersSpinnerModel)
             modelParametersPane.add(getSpinnerPane("Number of across-layers", acrossLayersSpinner))
-            rotationSpinner.addChangeListener { e: ChangeEvent? ->
+            rotationSpinner.addChangeListener { _: ChangeEvent ->
                 alongLayersSpinnerModel.maximum = rotationSpinnerModel.number as Int
                 alongLayersSpinnerModel.value =
-                    Math.min((alongLayersSpinnerModel.number as Int), (alongLayersSpinnerModel.maximum as Int))
+                    min((alongLayersSpinnerModel.number as Int), (alongLayersSpinnerModel.maximum as Int))
             }
-            splinePane.addPointModifiedListener { i: Int?, p: Point2D.Double? ->
-                val splinePointCount = splinePane.spline.splinePoints.size
+            splinePane.addPointModifiedListener { _: Int, _: Point2D.Double? ->
+                val splinePointCount = splinePane.spline.splinePointList.size
                 acrossLayersSpinnerModel.maximum = splinePointCount
                 acrossLayersSpinnerModel.value =
-                    Math.min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
-                null
+                    min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
             }
             return modelParametersPane
         }
@@ -64,7 +73,7 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
     }
 
     private val keyPointParametersPane: JPanel
-        private get() {
+        get() {
             val keyPointParametersPane = JPanel()
             keyPointParametersPane.layout = BoxLayout(keyPointParametersPane, BoxLayout.PAGE_AXIS)
 
@@ -86,21 +95,20 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
             val ySpinnerModel = SpinnerNumberModel(0.0, -100.0, 100.0, 1.0)
             val ySpinner = JSpinner(ySpinnerModel)
             keyPointParametersPane.add(getSpinnerPane("Y", ySpinner))
-            xSpinner.addChangeListener { c: ChangeEvent? -> splinePane.setSelectedX(xSpinnerModel.number as Double) }
-            ySpinner.addChangeListener { c: ChangeEvent? -> splinePane.setSelectedY(ySpinnerModel.number as Double) }
+            xSpinner.addChangeListener { _: ChangeEvent -> splinePane.setSelectedX(xSpinnerModel.number as Double) }
+            ySpinner.addChangeListener { _: ChangeEvent -> splinePane.setSelectedY(ySpinnerModel.number as Double) }
             splinePane.addPointModifiedListener { i: Int, p: Point2D.Double ->
                 if (i == -1) {
                     indexField.text = "None"
                     xSpinner.isEnabled = false
                     ySpinner.isEnabled = false
-                    return@addPointModifiedListener null
+                } else {
+                    indexField.text = i.toString()
+                    xSpinner.isEnabled = true
+                    ySpinner.isEnabled = true
+                    xSpinnerModel.value = p.x
+                    ySpinnerModel.value = p.y
                 }
-                indexField.text = i.toString()
-                xSpinner.isEnabled = true
-                ySpinner.isEnabled = true
-                xSpinnerModel.value = p.x
-                ySpinnerModel.value = p.y
-                null
             }
             return keyPointParametersPane
         }
@@ -117,11 +125,11 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
                     splinePointsPerSegmentSpinner
                 )
             )
-            splinePointsPerSegmentSpinner.addChangeListener { l: ChangeEvent? ->
+            splinePointsPerSegmentSpinner.addChangeListener { _: ChangeEvent ->
                 splinePane.setSplinePointsPerSegment(splinePointsPerSegmentSpinnerModel.value as Int)
-                acrossLayersSpinnerModel.maximum = splinePane.spline.splinePoints.size
+                acrossLayersSpinnerModel.maximum = splinePane.spline.splinePointList.size
                 acrossLayersSpinnerModel.value =
-                    Math.min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
+                    min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
             }
             return splineParametersPane
         }

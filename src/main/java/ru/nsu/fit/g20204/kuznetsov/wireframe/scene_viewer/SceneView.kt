@@ -1,9 +1,26 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
 
-class SceneView(private var scene: SceneNode, private var camera: CameraNode?) : JPanel() {
-    var edgeColor = Color(0, 0, 0)
-    private var model: ModelNode?
-    private var rotateScreenOrigin: Point? = null
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.Node
+import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.backgroundColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.frameColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.splineColor
+import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.image.BufferedImage
+import javax.swing.JPanel
+import kotlin.math.min
+
+class SceneView(private var scene: SceneNode, private var camera: CameraNode) : JPanel() {
+    private var model: ModelNode
+    private lateinit var rotateScreenOrigin: Point
 
     init {
         model = scene.model
@@ -32,25 +49,23 @@ class SceneView(private var scene: SceneNode, private var camera: CameraNode?) :
     }
 
     fun mouseDragged(e: MouseEvent) {
-        if (rotateScreenOrigin == null) {
-            rotateScreenOrigin = e.point
-            return
-        }
-        val screenAxis = Point(e.x - rotateScreenOrigin!!.x, e.y - rotateScreenOrigin!!.y)
+        val screenAxis = Point(e.x - rotateScreenOrigin.x, e.y - rotateScreenOrigin.y)
+
         rotateScreenOrigin = e.point
+
         if (screenAxis.x == 0 && screenAxis.y == 0) {
             return
         }
         val focusNodeAxis = Vector(screenAxis.y.toDouble(), -screenAxis.x.toDouble(), 0.0, 1.0)
-        model!!.rotate(focusNodeAxis, rotationSpeed)
+        model.rotate(focusNodeAxis, rotationSpeed)
         this.repaint()
     }
 
     fun mouseWheelMoved(e: MouseWheelEvent) {
         val offset = e.preciseWheelRotation * zoomSpeed
-        if (camera!!.nearClippingPlane <= 0 && offset >= 0) return
-        camera!!.nearClippingPlane = camera!!.nearClippingPlane - offset
-        camera!!.translate(0.0, 0.0, offset)
+        if (camera.nearClippingPlane <= 0 && offset >= 0) return
+        camera.nearClippingPlane = camera.nearClippingPlane - offset
+        camera.translate(0.0, 0.0, offset)
         this.repaint()
     }
 
@@ -63,10 +78,9 @@ class SceneView(private var scene: SceneNode, private var camera: CameraNode?) :
             }
             val screenPoint1 = getScreenPoint(viewPortPoint1)
             val screenPoint2 = getScreenPoint(viewPortPoint2)
-            val color = getColorByDistance(edgeColor, Math.min(viewPortPoint1.z, viewPortPoint2!!.z))
-            g2d.color = color
+            g2d.color = splineColor
             g2d.stroke = BasicStroke(
-                (5 * (1 - Math.min(viewPortPoint1.z, viewPortPoint2.z))).toInt().toFloat(),
+                (5 * (1 - min(viewPortPoint1.z, viewPortPoint2.z))).toInt().toFloat(),
                 BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_BEVEL
             )
@@ -74,46 +88,41 @@ class SceneView(private var scene: SceneNode, private var camera: CameraNode?) :
         }
     }
 
-    fun setScene(scene: SceneNode, camera: CameraNode?) {
+    fun setScene(scene: SceneNode, camera: CameraNode) {
         this.scene = scene
         this.camera = camera
         model = scene.model
     }
 
-    private fun getScreenPoint(viewPortPoint: Vector?): Point {
-        val x = (viewPortPoint!!.x * width / camera!!.viewPortWidth).toInt() + width / 2
-        val y = (viewPortPoint.y * height / camera!!.viewPortHeight).toInt() + height / 2
+    private fun getScreenPoint(viewPortPoint: Vector): Point {
+        val x = (viewPortPoint.x * width / camera.viewPortWidth).toInt() + width / 2
+        val y = (viewPortPoint.y * height / camera.viewPortHeight).toInt() + height / 2
         return Point(x, y)
-    }
-
-    private fun getColorByDistance(color: Color, distance: Double): Color {
-        var distance = distance
-        distance = 1 - distance
-        val rgb = color.rgb
-        val red = Math.min(Math.max(((rgb shr 16 and 0xFF) * distance).toInt(), 0), 255)
-        val green = Math.min(Math.max(((rgb shr 8 and 0xFF) * distance).toInt(), 0), 255)
-        val blue = Math.min(Math.max(((rgb and 0xFF) * distance).toInt(), 0), 255)
-        val newRgb = 0xFF shl 24 or (red shl 16) or (green shl 8) or blue
-        return Color(newRgb)
     }
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         val g2d = g as Graphics2D
+
         if (width < height) {
-            camera!!.viewPortWidth = 1.5
-            camera!!.viewPortHeight = 1.5 * height / width
+            camera.viewPortWidth = 1.5
+            camera.viewPortHeight = 1.5 * height / width
         } else {
-            camera!!.viewPortHeight = 1.5
-            camera!!.viewPortWidth = 1.5 * width / height
+            camera.viewPortHeight = 1.5
+            camera.viewPortWidth = 1.5 * width / height
         }
+
         val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         val imageGraphics = bufferedImage.graphics as Graphics2D
-        imageGraphics.color = Color(169, 169, 169)
+
+        imageGraphics.color = backgroundColor
         imageGraphics.fillRect(0, 0, bufferedImage.width, bufferedImage.height)
+
         paintNode(bufferedImage, scene)
+
         g2d.drawImage(bufferedImage, (width - bufferedImage.width) / 2, (height - bufferedImage.height) / 2, this)
-        g2d.color = Color(40, 44, 52)
+
+        g2d.color = frameColor
         g2d.drawRect(
             (width - bufferedImage.width) / 2,
             (height - bufferedImage.height) / 2,
@@ -124,44 +133,43 @@ class SceneView(private var scene: SceneNode, private var camera: CameraNode?) :
 
     private fun paintNode(bufferedImage: BufferedImage, node: Node) {
         if (node is ModelNode) {
-            val modelNodeGlobalTransform = node.getGlobalTransform()
-            val modelScaleTransform: Matrix = node.boundBoxMatrix
-            val cameraGlobalTransform = camera!!.globalTransform
-            val cameraViewportTransform = camera!!.viewportTransform
-            val projectionMatrix = cameraViewportTransform.multiply(
-                cameraGlobalTransform.multiply(
-                    modelScaleTransform.multiply(
-                        modelNodeGlobalTransform
+            val projectionMatrix = camera.viewportTransform.multiply(
+                camera.globalTransform.multiply(
+                    node.boundBoxMatrix.multiply(
+                        node.globalTransform
                     )
                 )
             )
+
             val geometry: Geometry = node.model
             val g = bufferedImage.graphics as Graphics2D
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             val center = Vector(0.0, 0.0, 0.0, 1.0)
-            val viewPortCenter = projectionMatrix!!.multiply(center, true)
+            val viewPortCenter = projectionMatrix.multiply(center, true)
             val screenPointCenter = getScreenPoint(viewPortCenter)
-            val paintAxis = BiFunction<Vector, Color, Void?> { vector: Vector, color: Color? ->
+
+            val paintAxis = { vector: Vector, color: Color? ->
                 g.color = color
                 val viewPortAxis = projectionMatrix.multiply(vector, true)
                 val screenPointAxis = getScreenPoint(viewPortAxis)
                 g.drawLine(
-                    screenPointCenter.x,
-                    screenPointCenter.y,
-                    screenPointAxis.x,
-                    screenPointAxis.y
+                    screenPointCenter.x, screenPointCenter.y, screenPointAxis.x, screenPointAxis.y
                 )
-                null
             }
-            paintAxis.apply(Vector(1.0, 0.0, 0.0, 1.0), Color.RED)
-            paintAxis.apply(Vector(0.0, 1.0, 0.0, 1.0), Color.GREEN)
-            paintAxis.apply(Vector(0.0, 0.0, 1.0, 1.0), Color.BLUE)
-            val viewPortVertices: MutableList<Vector?> = ArrayList()
+
+            paintAxis(Vector(1.0, 0.0, 0.0, 1.0), Color.RED)
+            paintAxis(Vector(0.0, 1.0, 0.0, 1.0), Color.GREEN)
+            paintAxis(Vector(0.0, 0.0, 1.0, 1.0), Color.BLUE)
+
+            val viewPortVertices = ArrayList<Vector>()
+
             for (vertex in geometry.vertexList) {
                 viewPortVertices.add(projectionMatrix.multiply(vertex, true))
             }
+
             paintEdges(g, viewPortVertices, geometry.edgeList)
         }
+
         for (childNode in node.childNodes) {
             paintNode(bufferedImage, childNode)
         }

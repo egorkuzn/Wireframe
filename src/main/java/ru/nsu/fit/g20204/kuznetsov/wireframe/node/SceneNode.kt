@@ -1,8 +1,8 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.node
 
 class SceneNode(parentNode: Node?) : Node(parentNode) {
-    private val cameraNodeList: MutableList<CameraNode?> = ArrayList()
-    var model: ModelNode? = null
+    val cameraNodeList: MutableList<CameraNode> = ArrayList()
+    lateinit var model: ModelNode
     fun createCameraNode(): CameraNode {
         val camera = CameraNode(this)
         addChild(camera)
@@ -10,10 +10,10 @@ class SceneNode(parentNode: Node?) : Node(parentNode) {
         return camera
     }
 
-    fun addCameraNode(cameraNode: CameraNode?) {
+    fun addCameraNode(cameraNode: CameraNode) {
         cameraNodeList.add(cameraNode)
     }
 
-    val cameraList: List<CameraNode?>
+    val cameraList: List<CameraNode>
         get() = cameraNodeList
 }

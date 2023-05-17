@@ -1,20 +1,22 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
 
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.backgroundColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.brokenLineColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.keyPointColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.selectedKeyPointColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.splineColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.xAxisColor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.yAxisColor
 import java.awt.*
 import java.awt.event.*
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import javax.swing.JPanel
 
+
+
 class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseListener {
-    private val backgroundColor = Color(169, 169, 169)
-    private val xAxisColor = Color(51, 51, 51)
-    private val yAxisColor = Color(51, 51, 51)
-    private val keyPointColor = Color(42, 122, 255)
-    private val selectedKeyPointColor = Color(255, 0, 0)
-    private val brokenLineColor = Color(42, 46, 54)
-    private val splineColor = Color(94, 255, 0)
     private val axisSize = 2
     private val splineSize = 2
     private val brokenLineSize = 1
@@ -25,7 +27,7 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     private var horizontalOffset = 0
     private var dragOrigin: Point? = null
     private var dragPointIndex = 0
-    var pointModifiedListeners: MutableList<Unit> = ArrayList()
+    private var pointModifiedListeners = ArrayList<(Int, Point2D.Double) -> Unit>()
     val spline = BSpline()
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -88,19 +90,19 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     }
 
     private fun paintSpline(g2d: Graphics2D) {
-        if (spline.keyPoints.isEmpty()) {
+        if (spline.keyPointList.isEmpty()) {
             return
         }
         connectPointsWithStraightLines(g2d)
-        showKeyPoints(g2d)
+        showKeyPointList(g2d)
         showSpline(g2d)
     }
 
     private fun connectPointsWithStraightLines(g2d: Graphics2D) {
         g2d.stroke = BasicStroke(brokenLineSize.toFloat())
         g2d.color = brokenLineColor
-        var previousScreenKeyPoint = getPointOnScreen(spline.keyPoints[0])
-        for (point in spline.keyPoints) {
+        var previousScreenKeyPoint = getPointOnScreen(spline.keyPointList[0])
+        for (point in spline.keyPointList) {
             val screenPoint = getPointOnScreen(point)
             g2d.drawLine(previousScreenKeyPoint.x, previousScreenKeyPoint.y, screenPoint.x, screenPoint.y)
             previousScreenKeyPoint = screenPoint
@@ -127,11 +129,11 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
         return Point2D.Double(xContinuous, -yContinuous)
     }
 
-    private fun showKeyPoints(g2d: Graphics2D) {
+    private fun showKeyPointList(g2d: Graphics2D) {
         g2d.color = keyPointColor
-        for (keyPointIndex in spline.keyPoints.indices) {
-            val keyPoint = spline.keyPoints[keyPointIndex]
-            val screenPoint = this.getPointOnScreen(keyPoint!!.x, keyPoint.y)
+        for (keyPointIndex in spline.keyPointList.indices) {
+            val keyPoint = spline.keyPointList[keyPointIndex]
+            val screenPoint = this.getPointOnScreen(keyPoint.x, keyPoint.y)
             if (keyPointIndex == dragPointIndex) g2d.color = selectedKeyPointColor else g2d.color = keyPointColor
             g2d.drawOval(screenPoint.x - pointRadius, screenPoint.y - pointRadius, pointRadius * 2, pointRadius * 2)
         }
@@ -140,10 +142,11 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     private fun showSpline(g2d: Graphics2D) {
         g2d.stroke = BasicStroke(splineSize.toFloat())
         g2d.color = splineColor
-        val splinePoints = spline.splinePoints
-        if (!splinePoints!!.isEmpty()) {
-            var previousScreenSplinePoint = getPointOnScreen(splinePoints[0])
-            for (point in splinePoints) {
+
+        if (!spline.splinePointList.isEmpty()) {
+            var previousScreenSplinePoint = getPointOnScreen(spline.splinePointList[0])
+
+            for (point in spline.splinePointList) {
                 val screenPoint = getPointOnScreen(point)
                 g2d.drawLine(previousScreenSplinePoint.x, previousScreenSplinePoint.y, screenPoint.x, screenPoint.y)
                 previousScreenSplinePoint = screenPoint
@@ -151,7 +154,7 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
         }
     }
 
-    fun setZoom(zoom: Double) {
+    private fun setZoom(zoom: Double) {
         if (zoom <= 0 || zoom > 800) {
             return
         }
@@ -161,9 +164,9 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     }
 
     private fun findSelectedKeyPoint(point: Point): Int {
-        for (pointIndex in spline.keyPoints.indices) {
-            val keyPoint = spline.keyPoints[pointIndex]
-            val pointOnScreen = this.getPointOnScreen(keyPoint!!.x, keyPoint.y)
+        for (pointIndex in spline.keyPointList.indices) {
+            val keyPoint = spline.keyPointList[pointIndex]
+            val pointOnScreen = this.getPointOnScreen(keyPoint.x, keyPoint.y)
             pointOnScreen.x -= pointRadius
             pointOnScreen.y -= pointRadius
             val newBounds: Rectangle2D = Rectangle(
@@ -191,6 +194,7 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     }
 
     override fun mouseMoved(e: MouseEvent) {}
+
     private fun paneDrag(e: MouseEvent) {
         val deltaX = dragOrigin!!.x - e.x
         val deltaY = dragOrigin!!.y - e.y
@@ -207,7 +211,7 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
             continuousPoint.y
         )
         for (l in pointModifiedListeners) {
-            l.apply(dragPointIndex, spline.keyPoints[dragPointIndex])
+            l(dragPointIndex, spline.keyPointList[dragPointIndex])
         }
     }
 
@@ -226,16 +230,19 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
 
     private fun dragPoint(pointIndex: Int) {
         dragPointIndex = pointIndex
+
         for (l in pointModifiedListeners) {
-            l.apply(dragPointIndex, spline.keyPoints[dragPointIndex])
+            l(dragPointIndex, spline.keyPointList[dragPointIndex])
         }
     }
 
     private fun removeSplinePoint(pointIndex: Int) {
         spline.removeKeyPoint(pointIndex)
+
         dragPointIndex = -1
+
         for (l in pointModifiedListeners) {
-            l.apply(dragPointIndex, Point2D.Double(0.0, 0.0))
+            l(dragPointIndex, Point2D.Double(0.0, 0.0))
         }
     }
 
@@ -254,13 +261,13 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
     private fun addKeyButton(e: MouseEvent) {
         val point = getContinuousPoint(e.x, e.y)
         spline.addKeyPoint(point)
-        dragPointIndex = spline.keyPoints.size - 1
+        dragPointIndex = spline.keyPointList.size - 1
         for (l in pointModifiedListeners) {
-            l.apply(dragPointIndex, spline.keyPointList[dragPointIndex])
+            l(dragPointIndex, spline.keyPointList[dragPointIndex])
         }
     }
 
-    fun addPointModifiedListener(listener: Unit) {
+    fun addPointModifiedListener(listener: (Int, Point2D.Double) -> Unit) {
         pointModifiedListeners.add(listener)
     }
 

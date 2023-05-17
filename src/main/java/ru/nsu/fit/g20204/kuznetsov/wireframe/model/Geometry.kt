@@ -1,5 +1,7 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.model
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
+
 class Geometry {
     private val vectorList: MutableList<Vector>
     val edgeList: List<Int>

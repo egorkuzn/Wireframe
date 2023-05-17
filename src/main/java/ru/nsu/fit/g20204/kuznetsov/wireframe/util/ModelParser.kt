@@ -1,29 +1,26 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.util
 
+import ru.nsu.fit.g20204.kuznetsov.wireframe.Main
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
 import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode
 import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
 import java.io.*
 
 interface ModelParser {
     companion object {
-        fun fileToScene(file: File?): SceneNode? {
+        fun fileToScene(file: File): SceneNode? {
             try {
                 DataInputStream(FileInputStream(file)).use { input ->
                     val scene = SceneNode(null)
-                    scene.setLocalTransformMatrix(streamToMatrix(input))
-                    val camera = scene.createCameraNode()
-                    camera!!.setLocalTransformMatrix(streamToMatrix(input))
-                    camera.nearClippingPlane = input.readDouble()
-                    camera.farClippingPlane = input.readDouble()
-                    camera.viewPortWidth = input.readDouble()
-                    camera.viewPortHeight = input.readDouble()
+                    scene.localTransformMatrix = streamToMatrix(input)
                     val modelNode = ModelNode(scene)
-                    modelNode.setLocalTransformMatrix(streamToMatrix(input))
+                    modelNode.localTransformMatrix = streamToMatrix(input)
                     modelNode.model = streamToGeometry(input)
                     scene.addChild(modelNode)
                     scene.model = modelNode
+                    scene.createCameraNode()
                     return scene
                 }
             } catch (e: IOException) {
@@ -31,18 +28,12 @@ interface ModelParser {
             }
         }
 
-        fun sceneToFile(scene: SceneNode, file: File?): Boolean {
+        fun sceneToFile(scene: SceneNode, file: File): Boolean {
             try {
                 DataOutputStream(FileOutputStream(file)).use { output ->
-                    matrixToStream(scene.localTranformMatrix, output)
-                    val camera = scene.cameraList[0]
-                    matrixToStream(camera!!.localTranformMatrix, output)
-                    output.writeDouble(camera.nearClippingPlane)
-                    output.writeDouble(camera.farClippingPlane)
-                    output.writeDouble(camera.viewPortWidth)
-                    output.writeDouble(camera.viewPortHeight)
+                    matrixToStream(scene.localTransformMatrix, output)
                     val modelNode = scene.model
-                    matrixToStream(modelNode!!.localTranformMatrix, output)
+                    matrixToStream(modelNode.localTransformMatrix, output)
                     geometryToStream(modelNode.model, output)
                 }
             } catch (e: IOException) {
@@ -52,7 +43,7 @@ interface ModelParser {
         }
 
         @Throws(IOException::class)
-        fun streamToGeometry(input: DataInputStream): Geometry? {
+        fun streamToGeometry(input: DataInputStream): Geometry {
             val vertexList: MutableList<Vector> = ArrayList()
             val edgeList: MutableList<Int> = ArrayList()
             val vertexCount = input.readInt()
@@ -72,8 +63,8 @@ interface ModelParser {
         }
 
         @Throws(IOException::class)
-        fun geometryToStream(geometry: Geometry?, output: DataOutputStream) {
-            val vertexList = geometry!!.vertexList
+        fun geometryToStream(geometry: Geometry, output: DataOutputStream) {
+            val vertexList = geometry.vertexList
             val edgeList = geometry.edgeList
             output.writeInt(vertexList.size)
             for (vertex in vertexList) {
@@ -84,22 +75,22 @@ interface ModelParser {
             }
             output.writeInt(edgeList.size)
             for (vertexIndex in edgeList) {
-                output.writeInt(vertexIndex!!)
+                output.writeInt(vertexIndex)
             }
         }
 
         @Throws(IOException::class)
         fun matrixToStream(matrix: Matrix, output: DataOutputStream) {
             val matrixArray = matrix.matrix
-            for (doubles in matrixArray!!) {
-                for (j in matrixArray[0]!!.indices) {
-                    output.writeDouble(doubles!![j])
+            for (doubles in matrixArray) {
+                for (j in matrixArray[0].indices) {
+                    output.writeDouble(doubles[j])
                 }
             }
         }
 
         @Throws(IOException::class)
-        fun streamToMatrix(input: DataInputStream): Matrix? {
+        fun streamToMatrix(input: DataInputStream): Matrix {
             val matrixArray = Array(4) { DoubleArray(4) }
             for (i in 0..3) {
                 for (j in 0..3) {

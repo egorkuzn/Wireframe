@@ -12,35 +12,35 @@ interface ModelFactory {
             rotationCount: Int,
             alongLayerCount: Int,
             acrossLayerCount: Int
-        ): Geometry? {
-            if (spline.splinePoints.isEmpty()) {
-                return null
+        ): Geometry {
+            if (spline.splinePointList.isEmpty()) {
+                return Geometry()
             }
             require(rotationCount >= alongLayerCount) { "alongLayerCount can't be greater than rotationCount" }
-            require(spline.splinePoints.size >= acrossLayerCount) { "acrossLayerCount " + acrossLayerCount + " is greater than spline's point count " + spline.splinePoints.size }
+            require(spline.splinePointList.size >= acrossLayerCount) { "acrossLayerCount " + acrossLayerCount + " is greater than spline's point count " + spline.splinePointList.size }
             require(alongLayerCount > 0) { "alongLayerCount $alongLayerCount can't be zero" }
-            val vertexList = ArrayList<Vector?>()
+            val vertexList = ArrayList<Vector>()
 
             // Повернём каждую точку сплайна => получаем повенутый на угол сплайн
             // Сделаем поворот на одинаковый угол - получим вращение
-            for (point in spline.splinePoints) {
+            for (point in spline.splinePointList) {
                 for (i in 0 until rotationCount) {
                     val rotationMatrix: Matrix = Matrix.Companion.getRotationMatrix(
                         Vector(1.0, 0.0, 0.0, 1.0),
                         360 * i.toDouble() / rotationCount
                     )
-                    vertexList.add(rotationMatrix.multiply(Vector(point!!.x, point.y, 0.0, 1.0), true))
+                    vertexList.add(rotationMatrix.multiply(Vector(point.x, point.y, 0.0, 1.0), true))
                 }
             }
 
             // У нас есть сплайн с готовыми точками. Из них нужно выбрать те, которые мы будем считать
             // пересечениями с плоскостями
-            val edgeList = ArrayList(getSplineAcrossEdges(rotationCount, acrossLayerCount, spline.splinePoints.size))
+            val edgeList = ArrayList(getSplineAcrossEdges(rotationCount, acrossLayerCount, spline.splinePointList.size))
 
             // Как получали вершины повернутых сплайнов, так и соединяем нужные
             // Сначала идем по сплайну (возможно пропуская некоторые точки)
             // Т.е. получается некоторая ось. После получения можем переходить к отрисовке следующей
-            for (splineIndex in 0 until spline.splinePoints.size - 1) {
+            for (splineIndex in 0 until spline.splinePointList.size - 1) {
                 for (layer in 0 until alongLayerCount) {
                     edgeList.add(splineIndex * rotationCount + layer * rotationCount / alongLayerCount)
                     edgeList.add((splineIndex + 1) * rotationCount + layer * rotationCount / alongLayerCount)
@@ -49,7 +49,7 @@ interface ModelFactory {
             return Geometry(vertexList, edgeList)
         }
 
-        fun getSplineAcrossEdges(rotationCount: Int, acrossLayerCount: Int, splineSize: Int): List<Int>? {
+        private fun getSplineAcrossEdges(rotationCount: Int, acrossLayerCount: Int, splineSize: Int): List<Int> {
             val edgeList = ArrayList<Int>()
             // Т.к. полчаемый массив точек фигуры вращения получется сначала из вращения одной точки сплайна,
             // то пересекающий сплайн первй слой будет [0; rotationCount].

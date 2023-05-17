@@ -9,7 +9,7 @@ import javax.swing.JFrame
 class BSplineEditor : JFrame("B-Spline Editor") {
     private val splinePane = BSplinePane()
     private val paramPane = BSplineParamPane(splinePane, this)
-    private val splineChangedListeners: MutableList<Unit> = ArrayList()
+    private val splineChangedListeners: MutableList<(Geometry) -> Unit> = ArrayList()
 
     init {
         minimumSize = Dimension(640, 480)
@@ -25,13 +25,13 @@ class BSplineEditor : JFrame("B-Spline Editor") {
     val splineModel: Geometry
         get() = paramPane.splineModel
 
-    fun addSplineModelChangeListener(listener: Unit) {
+    fun addSplineModelChangeListener(listener: (Geometry) -> Unit) {
         splineChangedListeners.add(listener)
     }
 
     fun applySpline() {
         for (l in splineChangedListeners) {
-            l.apply(paramPane.splineModel)
+            l(paramPane.splineModel)
         }
     }
 }

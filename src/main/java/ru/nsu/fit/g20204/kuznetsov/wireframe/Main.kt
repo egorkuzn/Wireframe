@@ -8,8 +8,8 @@ import ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer.ViewerFrame
 import javax.swing.WindowConstants
 
 object Main {
-    var modelNode: ModelNode? = null
-    var camera: CameraNode? = null
+    lateinit var modelNode: ModelNode
+    lateinit var camera: CameraNode
     @JvmStatic
     fun main(args: Array<String>) {
         run()

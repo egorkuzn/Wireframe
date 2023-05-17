@@ -47,7 +47,7 @@ class Matrix {
         return resultVector
     }
 
-    fun multiply(other: Matrix?): Matrix {
+    fun multiply(other: Matrix): Matrix {
         val newMatrixArray = Array(4) { DoubleArray(4) }
         for (i in 0..3) {
             Arrays.fill(newMatrixArray[i], 0.0)
