@@ -1,11 +1,11 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe.util
 
 import ru.nsu.fit.g20204.kuznetsov.wireframe.Main
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.ModelNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.SceneNode
 import java.io.*
 
 interface ModelParser {

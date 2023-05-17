@@ -1,8 +1,8 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.model
+package ru.nsu.fit.g20204.kuznetsov.wireframe.util.model
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.model.BSpline
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Vector
 
 interface ModelFactory {
     companion object {
@@ -73,14 +73,16 @@ interface ModelFactory {
                     if (extraCount < extraBetweenSpace) {
                         extraCount++
                     }
-                    for (vertexIndex in (betweenStepSpace * layer + extraCount + layer) * rotationCount until betweenStepSpace * layer * rotationCount + rotationCount) {
+                    for (vertexIndex in (betweenStepSpace * layer + extraCount + layer) * rotationCount
+                            until (betweenStepSpace * layer + extraCount + layer) * rotationCount + rotationCount) {
                         edgeList.add(vertexIndex)
-                        if ((vertexIndex + 1) % rotationCount == 0) edgeList.add(vertexIndex - rotationCount + 1) else edgeList.add(
-                            vertexIndex + 1
-                        )
+                        if ((vertexIndex + 1) % rotationCount == 0)
+                            edgeList.add(vertexIndex - rotationCount + 1)
+                        else edgeList.add(vertexIndex + 1)
                     }
                 }
             }
+
             return edgeList
         }
     }

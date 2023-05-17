@@ -1,7 +1,7 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
+package ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.model.BSpline
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JFrame

@@ -1,7 +1,7 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.node
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
 import kotlin.math.max
 import kotlin.math.min
 

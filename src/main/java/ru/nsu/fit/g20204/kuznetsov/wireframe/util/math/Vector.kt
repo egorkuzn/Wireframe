@@ -1,4 +1,4 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.math
+package ru.nsu.fit.g20204.kuznetsov.wireframe.util.math
 
 class Vector {
     var x = 0.0

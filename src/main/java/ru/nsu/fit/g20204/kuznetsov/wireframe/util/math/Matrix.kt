@@ -1,6 +1,8 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.math
+package ru.nsu.fit.g20204.kuznetsov.wireframe.util.math
 
 import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 class Matrix {
     var matrix = Array(SIZE) { DoubleArray(SIZE) }
@@ -17,7 +19,7 @@ class Matrix {
     constructor(matrix: Array<DoubleArray>) {
         if (matrix.size != SIZE || matrix[0].size != SIZE) return
         for (i in 0..3) {
-            this.matrix[i] = Arrays.copyOf(matrix[i], SIZE)
+            this.matrix[i] = matrix[i].copyOf(SIZE)
         }
     }
 
@@ -114,21 +116,21 @@ class Matrix {
             return Matrix(
                 arrayOf(
                     doubleArrayOf(
-                        Math.cos(angle) + (1 - Math.cos(angle)) * x * x,
-                        (1 - Math.cos(angle)) * x * y - Math.sin(angle) * z,
-                        (1 - Math.cos(angle)) * x * z + Math.sin(angle) * y,
+                        cos(angle) + (1 - cos(angle)) * x * x,
+                        (1 - cos(angle)) * x * y - sin(angle) * z,
+                        (1 - cos(angle)) * x * z + sin(angle) * y,
                         0.0
                     ),
                     doubleArrayOf(
-                        (1 - Math.cos(angle)) * x * y + Math.sin(angle) * z,
-                        Math.cos(angle) + (1 - Math.cos(angle)) * y * y,
-                        (1 - Math.cos(angle)) * y * z - Math.sin(angle) * x,
+                        (1 - cos(angle)) * x * y + sin(angle) * z,
+                        cos(angle) + (1 - cos(angle)) * y * y,
+                        (1 - cos(angle)) * y * z - sin(angle) * x,
                         0.0
                     ),
                     doubleArrayOf(
-                        (1 - Math.cos(angle)) * x * z - Math.sin(angle) * y,
-                        (1 - Math.cos(angle)) * y * z + Math.sin(angle) * x,
-                        Math.cos(angle) + (1 - Math.cos(angle)) * z * z,
+                        (1 - cos(angle)) * x * z - sin(angle) * y,
+                        (1 - cos(angle)) * y * z + sin(angle) * x,
+                        cos(angle) + (1 - cos(angle)) * z * z,
                         0.0
                     ),
                     doubleArrayOf(0.0, 0.0, 0.0, 1.0)

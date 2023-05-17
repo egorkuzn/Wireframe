@@ -1,6 +1,6 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.model
+package ru.nsu.fit.g20204.kuznetsov.wireframe.util.model
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Vector
 
 class Geometry {
     private val vectorList: MutableList<Vector>

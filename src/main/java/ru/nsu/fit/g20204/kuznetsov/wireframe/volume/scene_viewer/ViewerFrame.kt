@@ -1,10 +1,10 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.scene_viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor.BSplineEditor
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.viewer.BSplineEditor
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.CameraNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.SceneNode
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.ActionEvent

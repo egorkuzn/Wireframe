@@ -1,7 +1,7 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
+package ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.ModelFactory
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.ModelFactory
 import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.event.ActionEvent
@@ -49,6 +49,7 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
             // Rotation count
             val acrossLayersSpinner = JSpinner(acrossLayersSpinnerModel)
             modelParametersPane.add(getSpinnerPane("Number of across-layers", acrossLayersSpinner))
+
             rotationSpinner.addChangeListener { _: ChangeEvent ->
                 alongLayersSpinnerModel.maximum = rotationSpinnerModel.number as Int
                 alongLayersSpinnerModel.value =
@@ -141,6 +142,7 @@ class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplin
             val rotatingCount = rotationSpinnerModel.number as Int
             val alongLayerCount = alongLayersSpinnerModel.number as Int
             val acrossLayerCount = acrossLayersSpinnerModel.number as Int
+            println(acrossLayerCount)
             return ModelFactory.createRoutedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount)
         }
 }

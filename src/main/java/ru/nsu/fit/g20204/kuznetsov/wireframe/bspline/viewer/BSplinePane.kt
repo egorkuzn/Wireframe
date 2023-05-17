@@ -1,6 +1,6 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
+package ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline
+import ru.nsu.fit.g20204.kuznetsov.wireframe.bspline.model.BSpline
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.backgroundColor
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.brokenLineColor
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.keyPointColor
@@ -109,8 +109,8 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
         }
     }
 
-    private fun getPointOnScreen(point: Point2D.Double?): Point {
-        return getPointOnScreen(point!!.getX(), point.getY())
+    private fun getPointOnScreen(point: Point2D.Double): Point {
+        return getPointOnScreen(point.getX(), point.getY())
     }
 
     private fun getPointOnScreen(x: Double, y: Double): Point {
@@ -143,7 +143,7 @@ class BSplinePane : JPanel(), MouseWheelListener, MouseMotionListener, MouseList
         g2d.stroke = BasicStroke(splineSize.toFloat())
         g2d.color = splineColor
 
-        if (!spline.splinePointList.isEmpty()) {
+        if (spline.splinePointList.isNotEmpty()) {
             var previousScreenSplinePoint = getPointOnScreen(spline.splinePointList[0])
 
             for (point in spline.splinePointList) {

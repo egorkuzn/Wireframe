@@ -1,6 +1,6 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.scene_viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.SceneNode
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ModelParser
 import java.awt.FileDialog
 import java.io.File

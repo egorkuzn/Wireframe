@@ -1,4 +1,4 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.scene_viewer
 
 import java.awt.Dimension
 import java.awt.event.ActionEvent

@@ -1,6 +1,6 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.node
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
 
 class CameraNode(parentNode: Node) : Node(parentNode) {
     var viewPortWidth = 4.0

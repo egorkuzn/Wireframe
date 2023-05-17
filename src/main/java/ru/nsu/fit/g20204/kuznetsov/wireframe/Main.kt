@@ -1,10 +1,10 @@
 package ru.nsu.fit.g20204.kuznetsov.wireframe
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer.ViewerFrame
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.CameraNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.ModelNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.scene_viewer.ViewerFrame
 import javax.swing.WindowConstants
 
 object Main {

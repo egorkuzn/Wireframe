@@ -1,12 +1,12 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.scene_viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.Geometry
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.ModelNode
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.Node
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Matrix
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.math.Vector
+import ru.nsu.fit.g20204.kuznetsov.wireframe.util.model.Geometry
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.CameraNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.ModelNode
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.Node
+import ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node.SceneNode
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.backgroundColor
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.frameColor
 import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ColorKeeper.splineColor
@@ -79,11 +79,6 @@ class SceneView(private var scene: SceneNode, private var camera: CameraNode) : 
             val screenPoint1 = getScreenPoint(viewPortPoint1)
             val screenPoint2 = getScreenPoint(viewPortPoint2)
             g2d.color = splineColor
-            g2d.stroke = BasicStroke(
-                (5 * (1 - min(viewPortPoint1.z, viewPortPoint2.z))).toInt().toFloat(),
-                BasicStroke.CAP_ROUND,
-                BasicStroke.JOIN_BEVEL
-            )
             g2d.drawLine(screenPoint1.x, screenPoint1.y, screenPoint2.x, screenPoint2.y)
         }
     }

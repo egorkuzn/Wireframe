@@ -1,4 +1,4 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.node
+package ru.nsu.fit.g20204.kuznetsov.wireframe.volume.node
 
 class SceneNode(parentNode: Node?) : Node(parentNode) {
     val cameraNodeList: MutableList<CameraNode> = ArrayList()
