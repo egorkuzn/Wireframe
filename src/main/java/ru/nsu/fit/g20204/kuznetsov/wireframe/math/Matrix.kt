@@ -1,122 +1,139 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.math;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.math
 
-import java.util.Arrays;
+import java.util.*
 
-import static java.lang.Math.*;
-import static java.lang.Math.cos;
+class Matrix {
+    var matrix = Array(SIZE) { DoubleArray(SIZE) }
 
-public class Matrix {
-    private final static int SIZE = 4;
-    public double[][] matrix = new double[SIZE][SIZE];
-    
-    public Matrix() {
-        matrix = new double[][] {
-                {1, 0, 0, 0},
-                {0, 1, 0, 0},
-                {0, 0, 1, 0},
-                {0, 0, 0, 1}
-        };
+    constructor() {
+        matrix = arrayOf(
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+        )
     }
-    
-    public Matrix(double[][] matrix) {
-        if (matrix.length != SIZE || matrix[0].length != SIZE)
-            return;
-        
-        for (int i = 0; i < 4; i++) {
-            this.matrix[i] = Arrays.copyOf(matrix[i], SIZE);
+
+    constructor(matrix: Array<DoubleArray>) {
+        if (matrix.size != SIZE || matrix[0].size != SIZE) return
+        for (i in 0..3) {
+            this.matrix[i] = Arrays.copyOf(matrix[i], SIZE)
         }
     }
-    
-    public Matrix multiply(double value) {
-        double[][] newMatrix = new double[SIZE][SIZE];
-        
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < 4; j++) {
-                newMatrix[i][j] = this.matrix[i][j] * value;
+
+    fun multiply(value: Double): Matrix {
+        val newMatrix = Array(SIZE) { DoubleArray(SIZE) }
+        for (i in 0 until SIZE) {
+            for (j in 0..3) {
+                newMatrix[i][j] = matrix[i][j] * value
             }
         }
-        
-        return new Matrix(newMatrix);
+        return Matrix(newMatrix)
     }
 
-    public Vector multiply(Vector vector, boolean wCorrect) {
-        Vector resultVector = new Vector();
-
-        resultVector.x = vector.x * matrix[0][0] + vector.y * matrix[0][1] + vector.z * matrix[0][2] + vector.w * matrix[0][3];
-        resultVector.y = vector.x * matrix[1][0] + vector.y * matrix[1][1] + vector.z * matrix[1][2] + vector.w * matrix[1][3];
-        resultVector.z = vector.x * matrix[2][0] + vector.y * matrix[2][1] + vector.z * matrix[2][2] + vector.w * matrix[2][3];
-        resultVector.w = vector.x * matrix[3][0] + vector.y * matrix[3][1] + vector.z * matrix[3][2] + vector.w * matrix[3][3];
-
+    fun multiply(vector: Vector, wCorrect: Boolean): Vector {
+        val resultVector = Vector()
+        resultVector.x =
+            vector.x * matrix[0][0] + vector.y * matrix[0][1] + vector.z * matrix[0][2] + vector.w * matrix[0][3]
+        resultVector.y =
+            vector.x * matrix[1][0] + vector.y * matrix[1][1] + vector.z * matrix[1][2] + vector.w * matrix[1][3]
+        resultVector.z =
+            vector.x * matrix[2][0] + vector.y * matrix[2][1] + vector.z * matrix[2][2] + vector.w * matrix[2][3]
+        resultVector.w =
+            vector.x * matrix[3][0] + vector.y * matrix[3][1] + vector.z * matrix[3][2] + vector.w * matrix[3][3]
         if (wCorrect) {
-            resultVector.correctW();
+            resultVector.correctW()
         }
-
-        return resultVector;
+        return resultVector
     }
 
-    public Matrix multiply(Matrix other) {
-        double[][] newMatrixArray = new double[4][4];
-        for (int i = 0; i < 4; i++) {
-            Arrays.fill(newMatrixArray[i], 0);
+    fun multiply(other: Matrix?): Matrix {
+        val newMatrixArray = Array(4) { DoubleArray(4) }
+        for (i in 0..3) {
+            Arrays.fill(newMatrixArray[i], 0.0)
         }
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    newMatrixArray[i][k] += this.matrix[i][j] * other.matrix[j][k];
+        for (i in 0..3) {
+            for (j in 0..3) {
+                for (k in 0..3) {
+                    newMatrixArray[i][k] += matrix[i][j] * other!!.matrix[j][k]
                 }
             }
         }
-
-        return new Matrix(newMatrixArray);
+        return Matrix(newMatrixArray)
     }
 
-    public Matrix translate(double dx, double dy, double dz) {
-        Matrix translationMatrix = Matrix.getTranslationMatrix(dx, dy, dz);
-
-        return translationMatrix.multiply(this);
-    }
-    
-    public Matrix rotate(Vector axis, double angle) {
-        Matrix rotationMatrix = Matrix.getRotationMatrix(axis, angle);
-
-        return rotationMatrix.multiply(this);
-    }
-    
-    public Matrix scale(double xScale, double yScale, double zScale) {
-        Matrix scaleMatrix = Matrix.getScaleMatrix(xScale, yScale, zScale);
-
-        return scaleMatrix.multiply(this);
+    fun translate(dx: Double, dy: Double, dz: Double): Matrix {
+        val translationMatrix = getTranslationMatrix(dx, dy, dz)
+        return translationMatrix.multiply(this)
     }
 
-    private static Matrix getTranslationMatrix(double dx, double dy, double dz) {
-        return new Matrix(new double[][] {{1, 0, 0, dx},
-                {0, 1, 0, dy},
-                {0, 0, 1, dz},
-                {0, 0, 0, 1}});
-    }
-    
-    public static Matrix getScaleMatrix(double xScale, double yScale, double zScale) {
-        return new Matrix(new double[][] {{xScale, 0, 0, 0},
-                {0, yScale, 0, 0},
-                {0, 0, zScale, 0},
-                {0, 0, 0, 1}});
-    }
-    
-    public static Matrix getRotationMatrix(Vector axis, double angleDegrees) {
-        axis.normalize();
-        double x = axis.x;
-        double y = axis.y;
-        double z = axis.z;
-        double angle = angleDegrees * 2 * PI / 360;
-        return new Matrix(new double[][] {{cos(angle) + (1 - cos(angle)) * x * x, (1 - cos(angle)) * x * y - sin(angle) * z, (1 - cos(angle)) * x * z + sin(angle) * y, 0},
-                {(1 - cos(angle)) * x * y + sin(angle) * z, cos(angle) + (1 - cos(angle)) * y * y, (1 - cos(angle)) * y * z - sin(angle) * x, 0},
-                {(1 - cos(angle)) * x * z - sin(angle) * y, (1 - cos(angle)) * y * z + sin(angle) * x, cos(angle) + (1 - cos(angle)) * z * z, 0},
-                {0                                      , 0                                          , 0                                    , 1}});
+    fun rotate(axis: Vector, angle: Double): Matrix {
+        val rotationMatrix = getRotationMatrix(axis, angle)
+        return rotationMatrix.multiply(this)
     }
 
-    @Override
-    public String toString() {
-        return Arrays.deepToString(matrix);
+    fun scale(xScale: Double, yScale: Double, zScale: Double): Matrix {
+        val scaleMatrix = getScaleMatrix(xScale, yScale, zScale)
+        return scaleMatrix.multiply(this)
+    }
+
+    override fun toString(): String {
+        return Arrays.deepToString(matrix)
+    }
+
+    companion object {
+        private const val SIZE = 4
+        private fun getTranslationMatrix(dx: Double, dy: Double, dz: Double): Matrix {
+            return Matrix(
+                arrayOf(
+                    doubleArrayOf(1.0, 0.0, 0.0, dx),
+                    doubleArrayOf(0.0, 1.0, 0.0, dy),
+                    doubleArrayOf(0.0, 0.0, 1.0, dz),
+                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+                )
+            )
+        }
+
+        fun getScaleMatrix(xScale: Double, yScale: Double, zScale: Double): Matrix {
+            return Matrix(
+                arrayOf(
+                    doubleArrayOf(xScale, 0.0, 0.0, 0.0),
+                    doubleArrayOf(0.0, yScale, 0.0, 0.0),
+                    doubleArrayOf(0.0, 0.0, zScale, 0.0),
+                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+                )
+            )
+        }
+
+        fun getRotationMatrix(axis: Vector, angleDegrees: Double): Matrix {
+            axis.normalize()
+            val x = axis.x
+            val y = axis.y
+            val z = axis.z
+            val angle = angleDegrees * 2 * Math.PI / 360
+            return Matrix(
+                arrayOf(
+                    doubleArrayOf(
+                        Math.cos(angle) + (1 - Math.cos(angle)) * x * x,
+                        (1 - Math.cos(angle)) * x * y - Math.sin(angle) * z,
+                        (1 - Math.cos(angle)) * x * z + Math.sin(angle) * y,
+                        0.0
+                    ),
+                    doubleArrayOf(
+                        (1 - Math.cos(angle)) * x * y + Math.sin(angle) * z,
+                        Math.cos(angle) + (1 - Math.cos(angle)) * y * y,
+                        (1 - Math.cos(angle)) * y * z - Math.sin(angle) * x,
+                        0.0
+                    ),
+                    doubleArrayOf(
+                        (1 - Math.cos(angle)) * x * z - Math.sin(angle) * y,
+                        (1 - Math.cos(angle)) * y * z + Math.sin(angle) * x,
+                        Math.cos(angle) + (1 - Math.cos(angle)) * z * z,
+                        0.0
+                    ),
+                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+                )
+            )
+        }
     }
 }

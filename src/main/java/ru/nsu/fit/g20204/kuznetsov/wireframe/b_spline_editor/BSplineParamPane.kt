@@ -1,158 +1,138 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.BSpline;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.model.*;
+class BSplineParamPane(private val splinePane: BSplinePane, splineEditor: BSplineEditor) : JPanel() {
+    private val splinePointsPerSegmentSpinnerModel = SpinnerNumberModel(10, 2, 100, 1)
+    private val acrossLayersSpinnerModel = SpinnerNumberModel(0, 0, 0, 1)
+    private val rotationSpinnerModel = SpinnerNumberModel(6, 1, 360, 1)
+    private val alongLayersSpinnerModel = SpinnerNumberModel(6, 1, 6, 1)
 
-import javax.swing.*;
-import java.awt.*;
-
-public class BSplineParamPane extends JPanel {
-    private final BSplinePane splinePane;
-
-    private final SpinnerNumberModel splinePointsPerSegmentSpinnerModel = new SpinnerNumberModel(10, 2, 100, 1);
-
-    private final SpinnerNumberModel acrossLayersSpinnerModel = new SpinnerNumberModel(0, 0, 0, 1);
-
-    private final SpinnerNumberModel rotationSpinnerModel = new SpinnerNumberModel(6, 1, 360, 1);
-
-    private final SpinnerNumberModel alongLayersSpinnerModel = new SpinnerNumberModel(6, 1, 6, 1);
-
-
-    public BSplineParamPane(BSplinePane splinePane, BSplineEditor splineEditor) {
-        super();
-        this.splinePane = splinePane;
-        addAll(splineEditor);
+    init {
+        addAll(splineEditor)
     }
 
-    private void addAll(BSplineEditor splineEditor) {
-        add(getSplineParameterPane());
-        add(getKeyPointParametersPane());
-        add(getModelParametersPane());
-        add(getApplyButton(splineEditor));
+    private fun addAll(splineEditor: BSplineEditor) {
+        add(splineParameterPane)
+        add(keyPointParametersPane)
+        add(modelParametersPane)
+        add(getApplyButton(splineEditor))
     }
 
-    private JButton getApplyButton(BSplineEditor splineEditor) {
-        JButton applyButton = new JButton("Apply");
-        applyButton.addActionListener(e -> splineEditor.applySpline());
-        return applyButton;
+    private fun getApplyButton(splineEditor: BSplineEditor): JButton {
+        val applyButton = JButton("Apply")
+        applyButton.addActionListener { e: ActionEvent? -> splineEditor.applySpline() }
+        return applyButton
     }
 
-    private JPanel getModelParametersPane() {
-        JPanel modelParametersPane = new JPanel();
-        modelParametersPane.setLayout(new BoxLayout(modelParametersPane, BoxLayout.PAGE_AXIS));
+    private val modelParametersPane: JPanel
+        private get() {
+            val modelParametersPane = JPanel()
+            modelParametersPane.layout = BoxLayout(modelParametersPane, BoxLayout.PAGE_AXIS)
 
-        // Rotation count
-        JSpinner rotationSpinner = new JSpinner(rotationSpinnerModel);
-        modelParametersPane.add(getSpinnerPane("Rotation count", rotationSpinner));
+            // Rotation count
+            val rotationSpinner = JSpinner(rotationSpinnerModel)
+            modelParametersPane.add(getSpinnerPane("Rotation count", rotationSpinner))
 
-        // Along-layer count
-        JSpinner alongLayersSpinner = new JSpinner(alongLayersSpinnerModel);
-        modelParametersPane.add(getSpinnerPane("Number of along-layers", alongLayersSpinner));
+            // Along-layer count
+            val alongLayersSpinner = JSpinner(alongLayersSpinnerModel)
+            modelParametersPane.add(getSpinnerPane("Number of along-layers", alongLayersSpinner))
 
-        // Rotation count
-        JSpinner acrossLayersSpinner = new JSpinner(acrossLayersSpinnerModel);
-        modelParametersPane.add(getSpinnerPane("Number of across-layers", acrossLayersSpinner));
-
-        rotationSpinner.addChangeListener(e -> {
-            alongLayersSpinnerModel.setMaximum((int) rotationSpinnerModel.getNumber());
-            alongLayersSpinnerModel.setValue(Math.min((Integer) alongLayersSpinnerModel.getNumber(), (Integer) alongLayersSpinnerModel.getMaximum()));
-        });
-
-        splinePane.addPointModifiedListener((i, p) -> {
-            int splinePointCount = splinePane.getSpline().getSplinePoints().size();
-
-            acrossLayersSpinnerModel.setMaximum(splinePointCount);
-            acrossLayersSpinnerModel.setValue(Math.min((Integer) acrossLayersSpinnerModel.getNumber(), (Integer) acrossLayersSpinnerModel.getMaximum()));
-
-            return null;
-        });
-
-        return modelParametersPane;
-    }
-
-    private Component getSpinnerPane(String name, JSpinner spinner) {
-        JPanel pane = new JPanel();
-        pane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JLabel label = new JLabel(name + ": ");
-        pane.add(label);
-        pane.add(spinner);
-        return pane;
-    }
-
-    private JPanel getKeyPointParametersPane() {
-        JPanel keyPointParametersPane = new JPanel();
-        keyPointParametersPane.setLayout(new BoxLayout(keyPointParametersPane, BoxLayout.PAGE_AXIS));
-
-        // Key point index
-        JPanel indexPane = new JPanel();
-        indexPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        indexPane.add(new JLabel("Index: "));
-
-        JTextArea indexField = new JTextArea();
-        indexField.setEditable(false);
-        indexPane.add(indexField);
-
-        keyPointParametersPane.add(indexPane);
-
-        // X coordinate
-        SpinnerNumberModel xSpinnerModel = new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0);
-        JSpinner xSpinner = new JSpinner(xSpinnerModel);
-        keyPointParametersPane.add(getSpinnerPane("X", xSpinner));
-
-        // Y coordinate
-        SpinnerNumberModel ySpinnerModel = new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0);
-        JSpinner ySpinner = new JSpinner(ySpinnerModel);
-        keyPointParametersPane.add(getSpinnerPane("Y", ySpinner));
-
-        xSpinner.addChangeListener(c -> splinePane.setSelectedX((double) xSpinnerModel.getNumber()));
-        ySpinner.addChangeListener(c -> splinePane.setSelectedY((double) ySpinnerModel.getNumber()));
-
-        splinePane.addPointModifiedListener((i, p) -> {
-            if (i == -1) {
-                indexField.setText("None");
-                xSpinner.setEnabled(false);
-                ySpinner.setEnabled(false);
-                return null;
+            // Rotation count
+            val acrossLayersSpinner = JSpinner(acrossLayersSpinnerModel)
+            modelParametersPane.add(getSpinnerPane("Number of across-layers", acrossLayersSpinner))
+            rotationSpinner.addChangeListener { e: ChangeEvent? ->
+                alongLayersSpinnerModel.maximum = rotationSpinnerModel.number as Int
+                alongLayersSpinnerModel.value =
+                    Math.min((alongLayersSpinnerModel.number as Int), (alongLayersSpinnerModel.maximum as Int))
             }
-            indexField.setText(String.valueOf(i));
+            splinePane.addPointModifiedListener { i: Int?, p: Point2D.Double? ->
+                val splinePointCount = splinePane.spline.splinePoints.size
+                acrossLayersSpinnerModel.maximum = splinePointCount
+                acrossLayersSpinnerModel.value =
+                    Math.min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
+                null
+            }
+            return modelParametersPane
+        }
 
-            xSpinner.setEnabled(true);
-            ySpinner.setEnabled(true);
-
-            xSpinnerModel.setValue(p.x);
-            ySpinnerModel.setValue(p.y);
-
-            return null;
-        });
-
-        return keyPointParametersPane;
+    private fun getSpinnerPane(name: String, spinner: JSpinner): Component {
+        val pane = JPanel()
+        pane.layout = FlowLayout(FlowLayout.LEFT)
+        val label = JLabel("$name: ")
+        pane.add(label)
+        pane.add(spinner)
+        return pane
     }
 
-    private JPanel getSplineParameterPane() {
-        JPanel splineParametersPane = new JPanel();
-        splineParametersPane.setLayout(new BoxLayout(splineParametersPane, BoxLayout.PAGE_AXIS));
+    private val keyPointParametersPane: JPanel
+        private get() {
+            val keyPointParametersPane = JPanel()
+            keyPointParametersPane.layout = BoxLayout(keyPointParametersPane, BoxLayout.PAGE_AXIS)
 
-        // Spline points per segment
-        JSpinner splinePointsPerSegmentSpinner = new JSpinner(splinePointsPerSegmentSpinnerModel);
-        splineParametersPane.add(getSpinnerPane("<html>Points per<br/>spline segment</html>", splinePointsPerSegmentSpinner));
+            // Key point index
+            val indexPane = JPanel()
+            indexPane.layout = FlowLayout(FlowLayout.LEFT)
+            indexPane.add(JLabel("Index: "))
+            val indexField = JTextArea()
+            indexField.isEditable = false
+            indexPane.add(indexField)
+            keyPointParametersPane.add(indexPane)
 
-        splinePointsPerSegmentSpinner.addChangeListener(l -> {
-            splinePane.setSplinePointsPerSegment((int) splinePointsPerSegmentSpinnerModel.getValue());
+            // X coordinate
+            val xSpinnerModel = SpinnerNumberModel(0.0, -100.0, 100.0, 1.0)
+            val xSpinner = JSpinner(xSpinnerModel)
+            keyPointParametersPane.add(getSpinnerPane("X", xSpinner))
 
-            acrossLayersSpinnerModel.setMaximum(splinePane.getSpline().getSplinePoints().size());
-            acrossLayersSpinnerModel.setValue(Math.min((Integer) acrossLayersSpinnerModel.getNumber(), (Integer) acrossLayersSpinnerModel.getMaximum()));
-        });
+            // Y coordinate
+            val ySpinnerModel = SpinnerNumberModel(0.0, -100.0, 100.0, 1.0)
+            val ySpinner = JSpinner(ySpinnerModel)
+            keyPointParametersPane.add(getSpinnerPane("Y", ySpinner))
+            xSpinner.addChangeListener { c: ChangeEvent? -> splinePane.setSelectedX(xSpinnerModel.number as Double) }
+            ySpinner.addChangeListener { c: ChangeEvent? -> splinePane.setSelectedY(ySpinnerModel.number as Double) }
+            splinePane.addPointModifiedListener { i: Int, p: Point2D.Double ->
+                if (i == -1) {
+                    indexField.text = "None"
+                    xSpinner.isEnabled = false
+                    ySpinner.isEnabled = false
+                    return@addPointModifiedListener null
+                }
+                indexField.text = i.toString()
+                xSpinner.isEnabled = true
+                ySpinner.isEnabled = true
+                xSpinnerModel.value = p.x
+                ySpinnerModel.value = p.y
+                null
+            }
+            return keyPointParametersPane
+        }
+    private val splineParameterPane: JPanel
+        private get() {
+            val splineParametersPane = JPanel()
+            splineParametersPane.layout = BoxLayout(splineParametersPane, BoxLayout.PAGE_AXIS)
 
-        return splineParametersPane;
-    }
+            // Spline points per segment
+            val splinePointsPerSegmentSpinner = JSpinner(splinePointsPerSegmentSpinnerModel)
+            splineParametersPane.add(
+                getSpinnerPane(
+                    "<html>Points per<br/>spline segment</html>",
+                    splinePointsPerSegmentSpinner
+                )
+            )
+            splinePointsPerSegmentSpinner.addChangeListener { l: ChangeEvent? ->
+                splinePane.setSplinePointsPerSegment(splinePointsPerSegmentSpinnerModel.value as Int)
+                acrossLayersSpinnerModel.maximum = splinePane.spline.splinePoints.size
+                acrossLayersSpinnerModel.value =
+                    Math.min((acrossLayersSpinnerModel.number as Int), (acrossLayersSpinnerModel.maximum as Int))
+            }
+            return splineParametersPane
+        }
 
-    public Geometry getSplineModel() throws IllegalArgumentException {
-        BSpline spline = splinePane.getSpline();
-
-        int rotatingCount = (int) rotationSpinnerModel.getNumber();
-        int alongLayerCount = (int) alongLayersSpinnerModel.getNumber();
-        int acrossLayerCount = (int) acrossLayersSpinnerModel.getNumber();
-
-        return ModelFactory.createRoutedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount);
-    }
+    @get:Throws(IllegalArgumentException::class)
+    val splineModel: Geometry
+        get() {
+            val spline = splinePane.spline
+            val rotatingCount = rotationSpinnerModel.number as Int
+            val alongLayerCount = alongLayersSpinnerModel.number as Int
+            val acrossLayerCount = acrossLayersSpinnerModel.number as Int
+            return ModelFactory.createRoutedSplineModel(spline, rotatingCount, alongLayerCount, acrossLayerCount)
+        }
 }

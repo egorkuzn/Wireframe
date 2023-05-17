@@ -1,31 +1,21 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.model;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.model
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector;
+class Geometry {
+    private val vectorList: MutableList<Vector>
+    val edgeList: List<Int>
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Geometry {
-    private final List<Vector> vectorList;
-    private final List<Integer> edgeList;
-
-    public Geometry() {
-        vectorList = new ArrayList<>();
-        edgeList = new ArrayList<>();
-        vectorList.add(new Vector(1, 1, 1, 1));
-        vectorList.add(new Vector(0, 0, 0, 1));
+    constructor() {
+        vectorList = ArrayList()
+        edgeList = ArrayList()
+        vectorList.add(Vector(1.0, 1.0, 1.0, 1.0))
+        vectorList.add(Vector(0.0, 0.0, 0.0, 1.0))
     }
 
-    public Geometry(List<Vector> vertexList, List<Integer> edgeList) {
-        this.vectorList = vertexList;
-        this.edgeList = edgeList;
+    constructor(vertexList: MutableList<Vector>, edgeList: List<Int>) {
+        vectorList = vertexList
+        this.edgeList = edgeList
     }
 
-    public List<Vector> getVertexList() {
-        return vectorList;
-    }
-
-    public List<Integer> getEdgeList() {
-        return edgeList;
-    }
+    val vertexList: List<Vector>
+        get() = vectorList
 }

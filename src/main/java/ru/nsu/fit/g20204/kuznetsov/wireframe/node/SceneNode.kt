@@ -1,38 +1,19 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.node;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.node
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SceneNode extends Node {
-    private List<CameraNode> cameraNodeList = new ArrayList<>();
-
-    private ModelNode modelNode;
-
-    public ModelNode getModel() {
-        return modelNode;
+class SceneNode(parentNode: Node?) : Node(parentNode) {
+    private val cameraNodeList: MutableList<CameraNode?> = ArrayList()
+    var model: ModelNode? = null
+    fun createCameraNode(): CameraNode {
+        val camera = CameraNode(this)
+        addChild(camera)
+        cameraNodeList.add(camera)
+        return camera
     }
 
-    public SceneNode(Node parentNode) {
-        super(parentNode);
+    fun addCameraNode(cameraNode: CameraNode?) {
+        cameraNodeList.add(cameraNode)
     }
 
-    public CameraNode createCameraNode() {
-        CameraNode camera = new CameraNode(this);
-        this.addChild(camera);
-        cameraNodeList.add(camera);
-
-        return camera;
-    }
-
-    public void addCameraNode(CameraNode cameraNode) {
-        cameraNodeList.add(cameraNode);
-    }
-
-    public List<CameraNode> getCameraList() {
-        return cameraNodeList;
-    }
-
-    public void setModel(ModelNode modelNode) {
-        this.modelNode = modelNode;
-    }
+    val cameraList: List<CameraNode?>
+        get() = cameraNodeList
 }

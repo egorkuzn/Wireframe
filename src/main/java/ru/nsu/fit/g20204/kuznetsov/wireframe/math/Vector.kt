@@ -1,76 +1,71 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.math;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.math
 
-public class Vector {
-    public double x;
-    public double y;
-    public double z;
-    public double w;
+class Vector {
+    var x = 0.0
+    var y = 0.0
+    var z = 0.0
+    var w = 0.0
 
-    public Vector(double x, double y, double z, double w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+    constructor(x: Double, y: Double, z: Double, w: Double) {
+        this.x = x
+        this.y = y
+        this.z = z
+        this.w = w
     }
-    public Vector(double[] arrayVector) {
-        if (arrayVector.length < 4)
-            return;
 
-        x = arrayVector[0];
-        y = arrayVector[1];
-        z = arrayVector[2];
-        w = arrayVector[3];
+    constructor(arrayVector: DoubleArray) {
+        if (arrayVector.size < 4) return
+        x = arrayVector[0]
+        y = arrayVector[1]
+        z = arrayVector[2]
+        w = arrayVector[3]
     }
-    public Vector() {}
 
-    public Vector multiply(Matrix m, boolean wCorrect) {
-        Vector resultVector = new Vector();
-        double[][] matrix = m.matrix;
+    constructor()
 
-        resultVector.x = this.x * matrix[0][0] + this.y * matrix[1][0] + this.z * matrix[2][0] + this.w * matrix[3][0];
-        resultVector.y = this.x * matrix[0][1] + this.y * matrix[1][1] + this.z * matrix[2][1] + this.w * matrix[3][1];
-        resultVector.z = this.x * matrix[0][2] + this.y * matrix[1][2] + this.z * matrix[2][2] + this.w * matrix[3][2];
-        resultVector.w = this.x * matrix[0][3] + this.y * matrix[1][3] + this.z * matrix[2][3] + this.w * matrix[3][3];
-
+    fun multiply(m: Matrix, wCorrect: Boolean): Vector {
+        val resultVector = Vector()
+        val matrix = m.matrix
+        resultVector.x = x * matrix!![0]!![0] + y * matrix[1]!![0] + z * matrix[2]!![0] + w * matrix[3]!![0]
+        resultVector.y = x * matrix[0]!![1] + y * matrix[1]!![1] + z * matrix[2]!![1] + w * matrix[3]!![1]
+        resultVector.z = x * matrix[0]!![2] + y * matrix[1]!![2] + z * matrix[2]!![2] + w * matrix[3]!![2]
+        resultVector.w = x * matrix[0]!![3] + y * matrix[1]!![3] + z * matrix[2]!![3] + w * matrix[3]!![3]
         if (wCorrect) {
-            resultVector.correctW();
+            resultVector.correctW()
         }
-
-        return resultVector;
+        return resultVector
     }
 
     /**
      * Changes vector's length to 1 by dividing each component by current length.
      */
-    public void normalize() {
-        double divider = Math.sqrt(x*x + y*y + z*z);
-        x /= divider;
-        y /= divider;
-        z /= divider;
+    fun normalize() {
+        val divider = Math.sqrt(x * x + y * y + z * z)
+        x /= divider
+        y /= divider
+        z /= divider
     }
 
     /**
      * Divides each component by w. In 3D graphics the vector represents the vertex correctly, if the 4th component w is equal to 1.
      */
-    public void correctW() {
-        if (this.w != 1.0) {
-            this.x /= this.w;
-            this.y /= this.w;
-            this.z /= this.w;
-            this.w = 1.0;
+    fun correctW() {
+        if (w != 1.0) {
+            x /= w
+            y /= w
+            z /= w
+            w = 1.0
         }
     }
 
-    /**
-     * Convert vector's coordinates to array.
-     * @return double[] {x, y, z, w}
-     */
-    public double[] getAsArray() {
-        return new double[] {x, y, w, z};
-    }
+    val asArray: DoubleArray
+        /**
+         * Convert vector's coordinates to array.
+         * @return double[] {x, y, z, w}
+         */
+        get() = doubleArrayOf(x, y, w, z)
 
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ", " + z + ", " + w + ")";
+    override fun toString(): String {
+        return "($x, $y, $z, $w)"
     }
 }

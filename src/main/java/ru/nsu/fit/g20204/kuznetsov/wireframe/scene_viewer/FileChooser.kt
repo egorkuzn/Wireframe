@@ -1,46 +1,27 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.util.ModelParser;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-
-public class FileChooser {
-    private JFrame parentFrame;
-
-    public FileChooser(JFrame parentFrame) {
-        this.parentFrame = parentFrame;
+class FileChooser(private val parentFrame: JFrame) {
+    fun showOpenDialog(): SceneNode? {
+        val fileDialog = FileDialog(parentFrame, "Open scene", FileDialog.LOAD)
+        fileDialog.file = "*.graphics"
+        fileDialog.isVisible = true
+        return if (fileDialog.file != null) {
+            ModelParser.Companion.fileToScene(fileDialog.files[0])
+        } else null
     }
 
-    public SceneNode showOpenDialog() {
-        FileDialog fileDialog = new FileDialog(parentFrame, "Open scene", FileDialog.LOAD);
-        fileDialog.setFile("*.graphics");
-        fileDialog.setVisible(true);
-
-        if(fileDialog.getFile() != null) {
-            return ModelParser.fileToScene(fileDialog.getFiles()[0]);
-        }
-
-        return null;
-    }
-
-    public void showSaveDialog(SceneNode scene) {
-        FileDialog fileDialog = new FileDialog(parentFrame, "Save scene", FileDialog.SAVE);
-        fileDialog.setFile("*.graphics");
-        fileDialog.setVisible(true);
-
-        if (fileDialog.getFile() != null) {
-            File file = fileDialog.getFiles()[0];
+    fun showSaveDialog(scene: SceneNode) {
+        val fileDialog = FileDialog(parentFrame, "Save scene", FileDialog.SAVE)
+        fileDialog.file = "*.graphics"
+        fileDialog.isVisible = true
+        if (fileDialog.file != null) {
+            var file = fileDialog.files[0]
 
             // Add extension if needed
-            if (!file.getName().endsWith(".graphics"))
-                file = new File(file.getPath() + ".graphics");
-
-            boolean saved = ModelParser.sceneToFile(scene, file);
+            if (!file.name.endsWith(".graphics")) file = File(file.path + ".graphics")
+            val saved: Boolean = ModelParser.Companion.sceneToFile(scene, file)
             if (!saved) {
-                JOptionPane.showMessageDialog(parentFrame, "Failed to save file!");
+                JOptionPane.showMessageDialog(parentFrame, "Failed to save file!")
             }
         }
     }

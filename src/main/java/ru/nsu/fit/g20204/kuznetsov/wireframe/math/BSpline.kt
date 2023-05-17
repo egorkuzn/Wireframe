@@ -1,67 +1,44 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.math;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.math
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.geom.Point2D
 
 /**
  * В данном коде описана алгебра B-сплайна
  */
-public class BSpline {
-    private static final int DEFAULT_SEGMENT_SIZE = 10;
-    /**
-     * @splineMatrix - матрица B-сплайна
-     */
-    private static final Matrix splineMatrix = new Matrix(
-            new double[][]{
-                    {-1, 3, -3, 1},
-                    {3, -6, 3, 0},
-                    {-3, 0, 3, 0},
-                    {1, 4, 1, 0}
-            }
-    ).multiply(1.0 / 6);
-
-    private List<Point2D.Double> keyPointList = new ArrayList<>();
-    private List<Point2D.Double> splinePointList = new ArrayList<>();
-
-    private int splinePointsPerSegment = DEFAULT_SEGMENT_SIZE;
-
-    public int getSplinePointsPerSegment() {
-        return splinePointsPerSegment;
+class BSpline {
+    private val keyPointList: MutableList<Point2D.Double?> = ArrayList()
+    private val splinePointList: MutableList<Point2D.Double> = ArrayList()
+    private var splinePointsPerSegment = DEFAULT_SEGMENT_SIZE
+    fun getSplinePointsPerSegment(): Int {
+        return splinePointsPerSegment
     }
 
-    public List<Point2D.Double> getKeyPoints() {
-        return keyPointList;
+    val keyPoints: List<Point2D.Double?>
+        get() = keyPointList
+
+    fun addKeyPoint(keyPoint: Point2D.Double?) {
+        keyPointList.add(keyPoint)
+        evaluateSpline()
     }
 
-    public void addKeyPoint(Point2D.Double keyPoint) {
-        keyPointList.add(keyPoint);
-
-        evaluateSpline();
+    fun setKeyPoint(index: Int, x: Double, y: Double) {
+        keyPointList[index] = Point2D.Double(x, y)
+        evaluateSpline()
     }
 
-    public void setKeyPoint(int index, double x, double y) {
-        keyPointList.set(index, new Point2D.Double(x, y));
-
-        evaluateSpline();
+    fun setKeyPointX(dragPointIndex: Int, x: Double) {
+        keyPointList[dragPointIndex]!!.x = x
+        evaluateSpline()
     }
 
-    public void setKeyPointX(int dragPointIndex, double x) {
-        keyPointList.get(dragPointIndex).x = x;
-
-        evaluateSpline();
+    fun setKeyPointY(dragPointIndex: Int, y: Double) {
+        keyPointList[dragPointIndex]!!.y = y
+        evaluateSpline()
     }
 
-    public void setKeyPointY(int dragPointIndex, double y) {
-        keyPointList.get(dragPointIndex).y = y;
-
-        evaluateSpline();
-    }
-
-    public void removeKeyPoint(int index) {
-        keyPointList.remove(index);
-
-        evaluateSpline();
+    fun removeKeyPoint(index: Int) {
+        keyPointList.removeAt(index)
+        evaluateSpline()
     }
 
     /**
@@ -69,76 +46,79 @@ public class BSpline {
      * Но т.к. счёт индексов осуществляется с 0
      * то i = 1
      */
-    public void evaluateSpline() {
-        splinePointList.clear();
-
-        if (keyPointList.size() < 4)
-            return;
-
-        for (int i = 1; i < keyPointList.size() - 2; i++) {
+    fun evaluateSpline() {
+        splinePointList.clear()
+        if (keyPointList.size < 4) return
+        for (i in 1 until keyPointList.size - 2) {
             // Get polynomial coefficients by multiplying the spline matrix by component vectors
-            Vector xCoefficients = splineMatrix.multiply(getXComponents(i), false);
-            Vector yCoefficients = splineMatrix.multiply(getYComponents(i), false);
-            splinePointsPerSegment(xCoefficients, yCoefficients);
+            val xCoefficients = splineMatrix!!.multiply(getXComponents(i), false)
+            val yCoefficients = splineMatrix.multiply(getYComponents(i), false)
+            splinePointsPerSegment(xCoefficients, yCoefficients)
         }
     }
 
     /**
-     * У нас в модели имеется <code>keyPointList</code>, которая уже хранит
+     * У нас в модели имеется `keyPointList`, которая уже хранит
      * все управляющие точки.
      * @param i проходимся по каждой управляющей точке и берём 3 следующие.
-     *          Таким образом это есть участок, в котором строится сплайн
+     * Таким образом это есть участок, в котором строится сплайн
      * @return тем самым получаем Pi .. Pi+3 вектор
      */
-    private Vector getXComponents(int i) {
-        return new Vector(
-                keyPointList.get(i-1).x,
-                keyPointList.get(i).x,
-                keyPointList.get(i+1).x,
-                keyPointList.get(i+2).x
-        );
+    private fun getXComponents(i: Int): Vector {
+        return Vector(
+            keyPointList[i - 1]!!.x,
+            keyPointList[i]!!.x,
+            keyPointList[i + 1]!!.x,
+            keyPointList[i + 2]!!.x
+        )
     }
 
-    private Vector getYComponents(int i) {
-        return new Vector(
-                keyPointList.get(i-1).y,
-                keyPointList.get(i).y,
-                keyPointList.get(i+1).y,
-                keyPointList.get(i+2).y
-        );
+    private fun getYComponents(i: Int): Vector {
+        return Vector(
+            keyPointList[i - 1]!!.y,
+            keyPointList[i]!!.y,
+            keyPointList[i + 1]!!.y,
+            keyPointList[i + 2]!!.y
+        )
     }
 
-    private void splinePointsPerSegment(Vector xCoefficients, Vector yCoefficients) {
-        double t;
-
-        for (int j = 0; j < splinePointsPerSegment; j++) {
-            t = (double) j /splinePointsPerSegment;
+    private fun splinePointsPerSegment(xCoefficients: Vector?, yCoefficients: Vector?) {
+        var t: Double
+        for (j in 0 until splinePointsPerSegment) {
+            t = j.toDouble() / splinePointsPerSegment
 
             // Coordinates of the new point
-            double x = xCoefficients.x * t * t * t
-                     + xCoefficients.y * t * t
-                     + xCoefficients.z * t
-                     + xCoefficients.w;
-
-            double y = yCoefficients.x * t * t * t
-                     + yCoefficients.y * t * t
-                     + yCoefficients.z * t
-                     + yCoefficients.w;
-
-            splinePointList.add(new Point2D.Double(x, y));
+            val x = xCoefficients!!.x * t * t * t + xCoefficients.y * t * t + xCoefficients.z * t + xCoefficients.w
+            val y = yCoefficients!!.x * t * t * t + yCoefficients.y * t * t + yCoefficients.z * t + yCoefficients.w
+            splinePointList.add(Point2D.Double(x, y))
         }
     }
 
-    public List<Point2D.Double> getKeyPointList() {
-        return keyPointList;
+    fun getKeyPointList(): List<Point2D.Double?> {
+        return keyPointList
     }
 
-    public List<Point2D.Double> getSplinePoints() {
-        return splinePointList;
+    val splinePoints: List<Point2D.Double>
+        get() = splinePointList
+
+    fun setSplinePointsPerSegment(splinePointsPerSegment: Int) {
+        this.splinePointsPerSegment = splinePointsPerSegment
+        evaluateSpline()
     }
 
-    public void setSplinePointsPerSegment(int splinePointsPerSegment) {
-        this.splinePointsPerSegment = splinePointsPerSegment;
-        evaluateSpline();
+    companion object {
+        private const val DEFAULT_SEGMENT_SIZE = 10
+
+        /**
+         * @splineMatrix - матрица B-сплайна
+         */
+        private val splineMatrix = Matrix(
+            arrayOf(
+                doubleArrayOf(-1.0, 3.0, -3.0, 1.0),
+                doubleArrayOf(3.0, -6.0, 3.0, 0.0),
+                doubleArrayOf(-3.0, 0.0, 3.0, 0.0),
+                doubleArrayOf(1.0, 4.0, 1.0, 0.0)
+            )
+        ).multiply(1.0 / 6)
     }
 }

@@ -1,56 +1,40 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.node;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.node
 
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Vector;
+import java.util.LinkedList
 
-import java.util.LinkedList;
-import java.util.List;
-
-public class Node {
-    private final Node parentNode;
-    private final List<Node> childNodes = new LinkedList<>();
-    private Matrix localTranformMatrix = new Matrix();
-
-    public Node(Node parentNode) {
-        this.parentNode = parentNode;
+open class Node(val parent: Node?) {
+    private val childNodes: MutableList<Node> = LinkedList()
+    private var localTranformMatrix: Matrix = Matrix()
+    fun addChild(node: Node) {
+        childNodes.add(node)
     }
 
-    public void addChild(Node node) {
-        childNodes.add(node);
+    fun getChildNodes(): List<Node> {
+        return childNodes
     }
 
-    public Node getParent() {
-        return parentNode;
+    fun getLocalTranformMatrix(): Matrix {
+        return localTranformMatrix
     }
 
-    public List<Node> getChildNodes() {
-        return childNodes;
+    val globalTransform: Matrix
+        get() = if (parent == null) {
+            localTranformMatrix
+        } else parent.globalTransform.multiply(localTranformMatrix)
+
+    fun translate(dx: Double, dy: Double, dz: Double) {
+        localTranformMatrix = localTranformMatrix.translate(dx, dy, dz)
     }
 
-    public Matrix getLocalTranformMatrix() {
-        return localTranformMatrix;
+    fun scale(xScale: Double, yScale: Double, zScale: Double) {
+        localTranformMatrix = localTranformMatrix.scale(xScale, yScale, zScale)
     }
 
-    public Matrix getGlobalTransform() {
-        if (parentNode == null) {
-            return  localTranformMatrix;
-        }
-
-        return parentNode.getGlobalTransform().multiply(localTranformMatrix);
-    }
-    public void translate(double dx, double dy, double dz) {
-        localTranformMatrix = localTranformMatrix.translate(dx, dy, dz);
+    fun rotate(axis: Vector?, angle: Double) {
+        localTranformMatrix = localTranformMatrix.rotate(axis, angle)
     }
 
-    public void scale(double xScale, double yScale, double zScale) {
-        localTranformMatrix = localTranformMatrix.scale(xScale, yScale, zScale);
-    }
-
-    public void rotate(Vector axis, double angle) {
-        this.localTranformMatrix = localTranformMatrix.rotate(axis, angle);
-    }
-
-    public void setLocalTransformMatrix(Matrix matrix) {
-        this.localTranformMatrix = matrix;
+    fun setLocalTransformMatrix(matrix: Matrix) {
+        localTranformMatrix = matrix
     }
 }

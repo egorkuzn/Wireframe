@@ -1,96 +1,78 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.awt.Dimension
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
+import javax.swing.*
 
-public class MenuBar extends JMenuBar {
-    private final HashMap<String, ActionListener> actions;
-
-    MenuBar(HashMap<String, ActionListener> actions) {
-        super();
-
-        this.actions = actions;
+class MenuBar internal constructor(private val actions: HashMap<String, ActionListener>) : JMenuBar() {
+    init {
 
         // File menu
-        this.add(this.getFileMenu());
+        this.add(fileMenu)
 
         // Edit menu
-        this.add(this.getEditMenu());
+        this.add(editMenu)
 
         // View menu
-        this.add(this.getViewMenu());
+        this.add(viewMenu)
 
         // About menu
-        this.add(this.getHelpMenu());
+        this.add(this.helpMenu)
     }
 
-    private JMenu getFileMenu() {
-        JMenu fileMenu = new JMenu("File");
-
-        JMenuItem openItem = new JMenuItem("Open");
-        fileMenu.add(openItem);
-
-        JMenuItem saveItem = new JMenuItem("Save");
-        fileMenu.add(saveItem);
-
-        return fileMenu;
-    }
-
-    private JMenu getEditMenu() {
-        JMenu editMenu = new JMenu("Edit");
-
-        JMenuItem splineEditorItem = new JMenuItem("B-Spline Editor");
-        splineEditorItem.addActionListener(actions.get("BSpline editor"));
-        editMenu.add(splineEditorItem);
-
-        return editMenu;
-    }
-
-    private JMenu getViewMenu() {
-        JMenu viewMenu = new JMenu("View");
-
-        JMenuItem normalizeViewItem = new JMenuItem("Normalize view");
-        normalizeViewItem.addActionListener(actions.get("Normalize view"));
-        viewMenu.add(normalizeViewItem);
-
-        return viewMenu;
-    }
-
-    @Override
-    public JMenu getHelpMenu() {
-        JMenu helpMenu = new JMenu("Help");
-
-        JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.addActionListener(e -> showAboutMessage());
-        helpMenu.add(aboutItem);
-
-        return helpMenu;
-    }
-
-    private void showAboutMessage() {
-        JTextArea aboutText = new JTextArea();
-
-        aboutText.setEditable(false);
-        aboutText.setLineWrap(true);
-        aboutText.setWrapStyleWord(true);
-
-        aboutText.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        try {
-            InputStreamReader aboutFile = new InputStreamReader(new FileInputStream("src/main/resources/about.txt"), StandardCharsets.UTF_8);
-            aboutText.read(aboutFile, "txt");
-        } catch (IOException e) {
-            aboutText.setText("Failed to load about.txt");
+    private val fileMenu: JMenu
+        private get() {
+            val fileMenu = JMenu("File")
+            val openItem = JMenuItem("Open")
+            fileMenu.add(openItem)
+            val saveItem = JMenuItem("Save")
+            fileMenu.add(saveItem)
+            return fileMenu
+        }
+    private val editMenu: JMenu
+        private get() {
+            val editMenu = JMenu("Edit")
+            val splineEditorItem = JMenuItem("B-Spline Editor")
+            splineEditorItem.addActionListener(actions["BSpline editor"])
+            editMenu.add(splineEditorItem)
+            return editMenu
+        }
+    private val viewMenu: JMenu
+        private get() {
+            val viewMenu = JMenu("View")
+            val normalizeViewItem = JMenuItem("Normalize view")
+            normalizeViewItem.addActionListener(actions["Normalize view"])
+            viewMenu.add(normalizeViewItem)
+            return viewMenu
         }
 
-        JScrollPane aboutTextScroll = new JScrollPane(aboutText);
-        aboutTextScroll.setPreferredSize(new Dimension(400, 200));
+    override fun getHelpMenu(): JMenu {
+        val helpMenu = JMenu("Help")
+        val aboutItem = JMenuItem("About")
+        aboutItem.addActionListener { e: ActionEvent? -> showAboutMessage() }
+        helpMenu.add(aboutItem)
+        return helpMenu
+    }
 
-        JOptionPane.showMessageDialog(this.getParent(), aboutTextScroll, "About", JOptionPane.INFORMATION_MESSAGE);
+    private fun showAboutMessage() {
+        val aboutText = JTextArea()
+        aboutText.isEditable = false
+        aboutText.lineWrap = true
+        aboutText.wrapStyleWord = true
+        aboutText.border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        try {
+            val aboutFile = InputStreamReader(FileInputStream("src/main/resources/about.txt"), StandardCharsets.UTF_8)
+            aboutText.read(aboutFile, "txt")
+        } catch (e: IOException) {
+            aboutText.text = "Failed to load about.txt"
+        }
+        val aboutTextScroll = JScrollPane(aboutText)
+        aboutTextScroll.preferredSize = Dimension(400, 200)
+        JOptionPane.showMessageDialog(parent, aboutTextScroll, "About", JOptionPane.INFORMATION_MESSAGE)
     }
 }

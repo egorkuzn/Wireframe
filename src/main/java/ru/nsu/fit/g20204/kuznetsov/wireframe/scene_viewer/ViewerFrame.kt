@@ -1,87 +1,56 @@
-package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer;
+package ru.nsu.fit.g20204.kuznetsov.wireframe.scene_viewer
 
-import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkIJTheme;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.b_spline_editor.BSplineEditor;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.math.Matrix;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.CameraNode;
-import ru.nsu.fit.g20204.kuznetsov.wireframe.node.SceneNode;
+class ViewerFrame(private var scene: SceneNode) : JFrame("3D Scene Viewer") {
+    private val actions: HashMap<String, ActionListener>
+    private val fileChooser = FileChooser(this)
+    private val sceneView: SceneView
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.HashMap;
-
-import static java.awt.BorderLayout.PAGE_START;
-
-public class ViewerFrame extends JFrame {
-    private HashMap<String, ActionListener> actions;
-    private FileChooser fileChooser = new FileChooser(this);
-
-    private SceneView sceneView;
-    private SceneNode scene;
-
-    public ViewerFrame(SceneNode sceneNode) {
-        super("3D Scene Viewer");
-
-        scene = sceneNode;
-
-        FlatAtomOneDarkIJTheme.setup();
-        SwingUtilities.updateComponentTreeUI(this);
-
-        setMinimumSize(new Dimension(640, 480));
-        setLocation(400, 160);
-        setVisible(true);
-
-        actions = new HashMap<>() {{
-            put("Normalize view", e -> {
-                scene.getModel().setLocalTransformMatrix(new Matrix());
-                repaint();
-            });
-            put("BSpline editor", e -> {
-                BSplineEditor splineEditor = new BSplineEditor();
-                splineEditor.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        scene.getModel().setModel(splineEditor.getSplineModel());
-                        repaint();
+    init {
+        SwingUtilities.updateComponentTreeUI(this)
+        minimumSize = Dimension(640, 480)
+        setLocation(400, 160)
+        isVisible = true
+        actions = object : HashMap<String?, ActionListener?>() {
+            init {
+                put("Normalize view", ActionListener { e: ActionEvent? ->
+                    scene.model.setLocalTransformMatrix(Matrix())
+                    repaint()
+                })
+                put("BSpline editor", ActionListener { e: ActionEvent? ->
+                    val splineEditor = BSplineEditor()
+                    splineEditor.addWindowListener(object : WindowAdapter() {
+                        override fun windowClosing(e: WindowEvent) {
+                            scene.model.model = splineEditor.splineModel
+                            repaint()
+                        }
+                    })
+                    splineEditor.addSplineModelChangeListener { m: Geometry? ->
+                        scene.model.model = m
+                        repaint()
+                        null
                     }
-                });
-                splineEditor.addSplineModelChangeListener(m -> {
-                    scene.getModel().setModel(m);
-                    repaint();
-                    return null;
-                });
-            });
-            put("Save", e -> {
-                fileChooser.showSaveDialog(scene);
-            });
-            put("Open", e -> {
-                SceneNode scene = fileChooser.showOpenDialog();
-
-                if (scene != null)
-                    setScene(scene, scene.getCameraList().get(0));
-            });
-        }};
-
-        var camera = scene.getCameraList().get(0);
-        sceneView = new SceneView(scene, camera);
-        add(sceneView);
-
-        var toolBar = new ToolBar(actions);
-        add(toolBar, PAGE_START);
-
-        var menuBar = new MenuBar(actions);
-        setJMenuBar(menuBar);
-
-        setScene(scene, camera);
-        pack();
+                })
+                put("Save", ActionListener { e: ActionEvent? -> fileChooser.showSaveDialog(scene) })
+                put("Open", ActionListener { e: ActionEvent? ->
+                    val scene = fileChooser.showOpenDialog()
+                    if (scene != null) setScene(scene, scene.cameraList[0])
+                })
+            }
+        }
+        val camera = scene.cameraList[0]
+        sceneView = SceneView(scene, camera)
+        add(sceneView)
+        val toolBar = ToolBar(actions)
+        add(toolBar, BorderLayout.PAGE_START)
+        val menuBar = MenuBar(actions)
+        jMenuBar = menuBar
+        setScene(scene, camera)
+        pack()
     }
 
-    public void setScene(SceneNode scene, CameraNode camera) {
-        this.scene = scene;
-        sceneView.setScene(scene, camera);
-        this.repaint();
+    fun setScene(scene: SceneNode, camera: CameraNode?) {
+        this.scene = scene
+        sceneView.setScene(scene, camera)
+        this.repaint()
     }
 }
